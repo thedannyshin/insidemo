@@ -66,6 +66,10 @@ const StreetViewPanorama = () => {
     fetch('/data/route.json')
       .then((r) => r.json())
       .then(async (data) => {
+        // Densify waypoints to ~10m spacing for ultra-smooth movement
+        if (data?.waypoints) {
+          data.waypoints = densifyWaypoints(data.waypoints, 10);
+        }
         routeDataRef.current = data;
         const wp = data?.waypoints?.[0];
         const lat = wp?.lat ?? 37.7855;
