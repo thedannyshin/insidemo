@@ -96,11 +96,11 @@ const CabinSceneContent = ({
 
       {/* Right screen — navigation */}
       <Html
-        position={[0.85, 1.1, -1.8]}
-        rotation={[0, -0.15, 0]}
+        position={[0.55, 0.95, 1.4]}
+        rotation={[0, Math.PI + 0.15, 0]}
         transform
         occlude
-        scale={0.005}
+        scale={0.004}
         style={{ pointerEvents: 'auto' }}
       >
         <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
