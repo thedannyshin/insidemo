@@ -158,6 +158,8 @@ const StreetViewPanorama = () => {
           loadImageLive(waypoints[0].lat, waypoints[0].lng, 315, 0, 100);
         }
       });
+    };
+    loadRoute();
   }, []);
 
   const loadImageLive = useCallback(async (lat: number, lng: number, heading: number, pitch: number, viewFov: number) => {
