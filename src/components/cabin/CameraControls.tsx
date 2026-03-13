@@ -13,6 +13,7 @@ interface CameraOffsetState {
 export const useCameraOffset = create<CameraOffsetState>((set) => ({
   offset: { x: 0, y: 0, z: 0 },
   rotation: { h: 0, v: 0 },
+  fov: 72,
   move: (dx, dy, dz) =>
     set((s) => ({
       offset: {
@@ -28,7 +29,11 @@ export const useCameraOffset = create<CameraOffsetState>((set) => ({
         v: Math.max(-0.4, Math.min(0.5, s.rotation.v + dv)),
       },
     })),
-  reset: () => set({ offset: { x: 0, y: 0, z: 0 }, rotation: { h: 0, v: 0 } }),
+  zoom: (delta) =>
+    set((s) => ({
+      fov: Math.max(30, Math.min(110, s.fov + delta)),
+    })),
+  reset: () => set({ offset: { x: 0, y: 0, z: 0 }, rotation: { h: 0, v: 0 }, fov: 72 }),
 }));
 
 const step = 0.15;
