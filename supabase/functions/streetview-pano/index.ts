@@ -24,52 +24,38 @@ serve(async (req) => {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#000}
-#pano{width:100%;height:100%}
-</style>
+<style>*{margin:0;padding:0}html,body,#pano{width:100%;height:100%;overflow:hidden;background:#000}</style>
 </head>
 <body>
 <div id="pano"></div>
-<script src="https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}"></script>
 <script>
-(function(){
-  var panoEl = document.getElementById('pano');
-  var panorama = new google.maps.StreetViewPanorama(panoEl, {
-    position: {lat: ${lat}, lng: ${lng}},
-    pov: {heading: ${heading}, pitch: ${pitch}},
-    zoom: 0,
-    disableDefaultUI: true,
-    showRoadLabels: false,
-    motionTracking: false,
-    motionTrackingControl: false,
-    linksControl: false,
-    clickToGo: false,
-    scrollwheel: false,
-    disableDoubleClickZoom: true
+function initPano(){
+  var p=new google.maps.StreetViewPanorama(document.getElementById("pano"),{
+    position:{lat:${lat},lng:${lng}},
+    pov:{heading:${heading},pitch:${pitch}},
+    zoom:0,
+    disableDefaultUI:true,
+    showRoadLabels:false,
+    motionTracking:false,
+    motionTrackingControl:false,
+    linksControl:false,
+    clickToGo:false,
+    scrollwheel:false,
+    disableDoubleClickZoom:true
   });
-
-  panorama.addListener('pov_changed', function(){
-    var pov = panorama.getPov();
-    window.parent.postMessage({type:'pov_changed', heading:pov.heading, pitch:pov.pitch}, '*');
+  p.addListener("pov_changed",function(){
+    var v=p.getPov();
+    window.parent.postMessage({type:"pov_changed",heading:v.heading,pitch:v.pitch},"*");
   });
-
-  window.addEventListener('message', function(e){
-    if(!e.data || !panorama) return;
-    if(e.data.type === 'update_position'){
-      panorama.setPosition({lat: e.data.lat, lng: e.data.lng});
-    }
-    if(e.data.type === 'update_pov'){
-      panorama.setPov({heading: e.data.heading || 0, pitch: e.data.pitch || 0});
-    }
-    if(e.data.type === 'update_all'){
-      panorama.setPosition({lat: e.data.lat, lng: e.data.lng});
-      panorama.setPov({heading: e.data.heading || 0, pitch: e.data.pitch || 0});
-    }
+  window.addEventListener("message",function(e){
+    if(!e.data||!p)return;
+    if(e.data.type==="update_pov"){p.setPov({heading:e.data.heading||0,pitch:e.data.pitch||0})}
+    if(e.data.type==="update_position"){p.setPosition({lat:e.data.lat,lng:e.data.lng})}
+    if(e.data.type==="update_all"){p.setPosition({lat:e.data.lat,lng:e.data.lng});p.setPov({heading:e.data.heading||0,pitch:e.data.pitch||0})}
   });
-})();
+}
 </script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initPano"></script>
 </body>
 </html>`;
 
