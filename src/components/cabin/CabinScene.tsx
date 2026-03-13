@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, Html, OrbitControls, Environment } from '@react-three/drei';
+import { useGLTF, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import LeftScreen from './LeftScreen';
 import RightScreen from './RightScreen';
