@@ -1,7 +1,1 @@
-project_id = "htzywzqrqacdxdkqakhx"
-
-[functions.maps-proxy]
-verify_jwt = false
-
-[functions.streetview]
-verify_jwt = false
+project_id = "jhogayiygatkarpctiwy"
