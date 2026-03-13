@@ -85,7 +85,7 @@ function initPano(){
       panoEl.classList.add("fading");
       pano.setPosition({lat:e.data.lat,lng:e.data.lng});
       clearTimeout(fadeTimer);
-      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},150);
+      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},300);
     }
     if(e.data.type==="update_all"){
       // Crossfade on position change
