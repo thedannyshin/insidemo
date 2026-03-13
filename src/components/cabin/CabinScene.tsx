@@ -33,9 +33,9 @@ const CameraController = () => {
 
     // Apply look rotation: compute a target point in front of camera
     const lookDist = 3;
-    const tx = cx + Math.sin(rotation.h) * lookDist;
+    const tx = cx + Math.sin(rotation.h + Math.PI) * lookDist;
     const ty = cy + rotation.v * lookDist;
-    const tz = cz + Math.cos(rotation.h) * lookDist;
+    const tz = cz + Math.cos(rotation.h + Math.PI) * lookDist;
     camera.lookAt(tx, ty, tz);
   });
   return null;
