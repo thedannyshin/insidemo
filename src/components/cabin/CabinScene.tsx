@@ -8,7 +8,7 @@ import { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewPanorama from './StreetViewPanorama';
 import { useRideStore } from '@/store/rideStore';
-import { useCameraBase } from './CameraDebugSliders';
+import CameraDebugSliders, { useCameraBase } from './CameraDebugSliders';
 
 const CameraController = () => {
   const baseX = useCameraBase((s) => s.baseX);
