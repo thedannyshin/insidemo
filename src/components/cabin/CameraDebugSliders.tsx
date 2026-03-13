@@ -4,18 +4,30 @@ interface CameraBaseState {
   baseX: number;
   baseY: number;
   baseZ: number;
-  setBase: (axis: 'baseX' | 'baseY' | 'baseZ', value: number) => void;
+  lookPitch: number;
+  lookYaw: number;
+  setBase: (axis: string, value: number) => void;
 }
 
 export const useCameraBase = create<CameraBaseState>((set) => ({
   baseX: -0.3,
   baseY: 0.39,
   baseZ: 0.16,
+  lookPitch: 0,
+  lookYaw: Math.PI,
   setBase: (axis, value) => set({ [axis]: value }),
 }));
 
 const CameraDebugSliders = () => {
-  const { baseX, baseY, baseZ, setBase } = useCameraBase();
+  const state = useCameraBase();
+
+  const sliders = [
+    { label: 'X', key: 'baseX', value: state.baseX, min: -2, max: 2, step: 0.01 },
+    { label: 'Y', key: 'baseY', value: state.baseY, min: -1, max: 2, step: 0.01 },
+    { label: 'Z', key: 'baseZ', value: state.baseZ, min: -2, max: 2, step: 0.01 },
+    { label: 'Pitch', key: 'lookPitch', value: state.lookPitch, min: -1, max: 1, step: 0.01 },
+    { label: 'Yaw', key: 'lookYaw', value: state.lookYaw, min: 0, max: Math.PI * 2, step: 0.01 },
+  ];
 
   return (
     <div
@@ -33,28 +45,24 @@ const CameraDebugSliders = () => {
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
-        minWidth: 260,
+        minWidth: 280,
         backdropFilter: 'blur(8px)',
         border: '1px solid rgba(255,255,255,0.15)',
       }}
     >
       <div style={{ fontWeight: 'bold', marginBottom: 4, color: '#7dd3fc' }}>
-        📷 Camera Position
+        📷 Camera Position & Angle
       </div>
-      {([
-        { label: 'X', key: 'baseX' as const, value: baseX, min: -2, max: 2 },
-        { label: 'Y', key: 'baseY' as const, value: baseY, min: -1, max: 2 },
-        { label: 'Z', key: 'baseZ' as const, value: baseZ, min: -2, max: 2 },
-      ]).map(({ label, key, value, min, max }) => (
+      {sliders.map(({ label, key, value, min, max, step }) => (
         <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 16, color: '#94a3b8' }}>{label}</span>
+          <span style={{ width: 40, color: '#94a3b8', fontSize: 11 }}>{label}</span>
           <input
             type="range"
             min={min}
             max={max}
-            step={0.01}
+            step={step}
             value={value}
-            onChange={(e) => setBase(key, parseFloat(e.target.value))}
+            onChange={(e) => state.setBase(key, parseFloat(e.target.value))}
             style={{ flex: 1, accentColor: '#38bdf8' }}
           />
           <span style={{ width: 50, textAlign: 'right', color: '#e2e8f0' }}>
@@ -63,7 +71,7 @@ const CameraDebugSliders = () => {
         </div>
       ))}
       <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>
-        Copy values when done, then remove this panel
+        Share values when done
       </div>
     </div>
   );
