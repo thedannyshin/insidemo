@@ -179,7 +179,7 @@ window.addEventListener("message",function(e){
       <iframe
         ref={iframeRef}
         srcDoc={srcdoc}
-        style={{ position: 'absolute', width: '100%', height: '120%', top: '-10%', border: 'none' }}
+        style={{ position: 'absolute', width: '100%', height: '140%', top: '-20%', border: 'none' }}
         allow="accelerometer; gyroscope; autoplay"
         title="360 Video View"
       />
