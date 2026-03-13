@@ -120,7 +120,7 @@ const CabinSceneContent = ({
         minPolarAngle={Math.PI * 0.35}
         maxDistance={5}
         minDistance={1}
-        target={[0, 1.2, -2]}
+        target={[0, 1.0, 2]}
       />
     </>
   );
