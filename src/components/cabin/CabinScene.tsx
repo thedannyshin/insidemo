@@ -78,7 +78,7 @@ const CabinScene = ({
 }) => (
   <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
     <Canvas
-      camera={{ position: [0, 1.1, 0.3], fov: 70, near: 0.01, far: 1000 }}
+      camera={{ position: [0, 1.0, -0.3], fov: 72, near: 0.01, far: 1000 }}
       gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
       className="absolute inset-0"
     >
