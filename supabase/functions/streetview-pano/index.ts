@@ -19,18 +19,45 @@ serve(async (req) => {
   const heading = parseFloat(url.searchParams.get("heading") || "315");
   const pitch = parseFloat(url.searchParams.get("pitch") || "0");
 
+  // Enhanced HTML with smooth crossfade transitions between panoramas
   const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<style>*{margin:0;padding:0}html,body,#pano{width:100%;height:100%;overflow:hidden;background:#000}</style>
+<style>
+*{margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#000}
+#pano{width:100%;height:100%;transition:opacity 0.4s ease}
+#pano.fading{opacity:0.6}
+</style>
 </head>
 <body>
 <div id="pano"></div>
 <script>
+var pano, panoEl, fadeTimer, povAnimFrame;
+var currentPov = {heading:${heading}, pitch:${pitch}};
+var targetPov = {heading:${heading}, pitch:${pitch}};
+
+function lerpAngle(a,b,t){
+  var d=((b-a+540)%360)-180;
+  return a+d*t;
+}
+
+function animatePov(){
+  var dh=Math.abs(((targetPov.heading-currentPov.heading+540)%360)-180);
+  var dp=Math.abs(targetPov.pitch-currentPov.pitch);
+  if(dh>0.1||dp>0.1){
+    currentPov.heading=lerpAngle(currentPov.heading,targetPov.heading,0.15);
+    currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.15;
+    pano.setPov(currentPov);
+  }
+  povAnimFrame=requestAnimationFrame(animatePov);
+}
+
 function initPano(){
-  var p=new google.maps.StreetViewPanorama(document.getElementById("pano"),{
+  panoEl=document.getElementById("pano");
+  pano=new google.maps.StreetViewPanorama(panoEl,{
     position:{lat:${lat},lng:${lng}},
     pov:{heading:${heading},pitch:${pitch}},
     zoom:0,
@@ -43,15 +70,32 @@ function initPano(){
     scrollwheel:false,
     disableDoubleClickZoom:true
   });
-  p.addListener("pov_changed",function(){
-    var v=p.getPov();
-    window.parent.postMessage({type:"pov_changed",heading:v.heading,pitch:v.pitch},"*");
-  });
+
+  // Start smooth POV animation loop
+  animatePov();
+
   window.addEventListener("message",function(e){
-    if(!e.data||!p)return;
-    if(e.data.type==="update_pov"){p.setPov({heading:e.data.heading||0,pitch:e.data.pitch||0})}
-    if(e.data.type==="update_position"){p.setPosition({lat:e.data.lat,lng:e.data.lng})}
-    if(e.data.type==="update_all"){p.setPosition({lat:e.data.lat,lng:e.data.lng});p.setPov({heading:e.data.heading||0,pitch:e.data.pitch||0})}
+    if(!e.data||!pano)return;
+    if(e.data.type==="update_pov"){
+      targetPov.heading=e.data.heading||0;
+      targetPov.pitch=e.data.pitch||0;
+    }
+    if(e.data.type==="update_position"){
+      // Crossfade on position change
+      panoEl.classList.add("fading");
+      pano.setPosition({lat:e.data.lat,lng:e.data.lng});
+      clearTimeout(fadeTimer);
+      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},150);
+    }
+    if(e.data.type==="update_all"){
+      // Crossfade on position change
+      panoEl.classList.add("fading");
+      pano.setPosition({lat:e.data.lat,lng:e.data.lng});
+      targetPov.heading=e.data.heading||0;
+      targetPov.pitch=e.data.pitch||0;
+      clearTimeout(fadeTimer);
+      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},150);
+    }
   });
 }
 </script>
