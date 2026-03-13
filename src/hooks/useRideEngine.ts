@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useRideStore, Incident } from '@/store/rideStore';
+import { densifyWaypoints } from '@/lib/densifyRoute';
 
 type IncidentEvent = {
   incident: Incident;
