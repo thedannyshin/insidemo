@@ -124,6 +124,11 @@ const CabinScene3D = ({
     <pointLight position={[0, 1.5, 4]} intensity={1.5} color="#ffd89b" />
     <hemisphereLight args={['#87CEEB', '#F5E6CA', 1.0]} />
     <CabinModel />
+    {/* Floor to block outside view beneath cabin */}
+    <mesh position={[0, -0.01, 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[4, 6]} />
+      <meshStandardMaterial color="#1a1a1a" roughness={1} />
+    </mesh>
     <CameraController />
 
     {/* Combined dashboard panel */}
