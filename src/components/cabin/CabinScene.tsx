@@ -137,9 +137,9 @@ const CabinScene = ({
     <div className="w-full h-screen" style={{ background: 'hsl(220, 20%, 4%)' }}>
       <Canvas
         camera={{
-          position: [0, 0.85, -0.3],
-          fov: 65,
-          near: 0.1,
+          position: [0, 0.9, -0.2],
+          fov: 75,
+          near: 0.05,
           far: 1000,
         }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
