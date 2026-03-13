@@ -75,7 +75,7 @@ const CabinScene = ({
   onStartRide: () => void;
   onReplay: () => void;
 }) => (
-  <div className="w-full h-screen relative" style={{ background: 'hsl(220, 20%, 4%)' }}>
+  <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
     <Canvas
       camera={{ position: [0, 0.9, -0.2], fov: 75, near: 0.05, far: 1000 }}
       gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
