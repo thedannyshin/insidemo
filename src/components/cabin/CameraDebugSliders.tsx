@@ -115,6 +115,7 @@ const CameraDebugSliders = () => {
     >
       <SliderGroup title="📷 Camera" color="#38bdf8" sliders={cameraSliders} onChange={state.setBase} />
       <SliderGroup title="🖥️ HUD Panel" color="#a78bfa" sliders={hudSliders} onChange={state.setBase} />
+      <SliderGroup title="🎥 Video Mapping" color="#4ade80" sliders={videoSliders} onChange={state.setBase} />
       <div style={{ fontSize: 10, color: '#64748b', marginTop: 4 }}>
         Share values when done
       </div>
