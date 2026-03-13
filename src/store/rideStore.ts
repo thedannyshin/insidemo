@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 export type RidePhase = 'pre-ride' | 'takeoff' | 'riding' | 'arrived';
+export type ViewMode = 'cabin' | 'birdseye';
 export type CabinMode = 'entertainment' | 'business' | 'relax' | 'party';
 export type IncidentSeverity = 'alert' | 'caution' | 'info';
 
@@ -41,6 +42,7 @@ export interface ActiveIncident extends Incident {
 interface RideState {
   // Core ride state
   phase: RidePhase;
+  viewMode: ViewMode;
   passengerName: string;
   destination: string;
   cabinMode: CabinMode;
@@ -64,6 +66,7 @@ interface RideState {
 
   // Actions
   setPhase: (phase: RidePhase) => void;
+  setViewMode: (mode: ViewMode) => void;
   setDestination: (destination: string) => void;
   setCabinMode: (mode: CabinMode) => void;
   setSpeed: (speed: number) => void;
@@ -90,6 +93,7 @@ const initialMusic: MusicState = {
 
 export const useRideStore = create<RideState>((set) => ({
   phase: 'pre-ride',
+  viewMode: 'cabin',
   passengerName: 'Alex',
   destination: '',
   cabinMode: 'entertainment',
@@ -106,6 +110,7 @@ export const useRideStore = create<RideState>((set) => ({
   music: initialMusic,
 
   setPhase: (phase) => set({ phase }),
+  setViewMode: (mode) => set({ viewMode: mode }),
   setDestination: (destination) => set({ destination }),
   setCabinMode: (mode) => set({ cabinMode: mode }),
   setSpeed: (speed) => set({ speed }),
@@ -143,6 +148,7 @@ export const useRideStore = create<RideState>((set) => ({
   resetRide: () =>
     set({
       phase: 'pre-ride',
+      viewMode: 'cabin',
       speed: 0,
       currentStreet: 'Market Street',
       nextTurn: '',

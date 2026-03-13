@@ -36,12 +36,13 @@ const CabinModel = () => {
 
 const CabinScene3D = () => (
   <>
-    <ambientLight intensity={1.2} color="#e8f0ff" />
-    <pointLight position={[0, 2.5, 0]} intensity={1.5} color="#ffffff" />
-    <pointLight position={[0, 1.5, -2]} intensity={0.8} color="#ffffff" />
-    <pointLight position={[-1.5, 1.5, -1]} intensity={0.6} color="#00b4d8" />
-    <pointLight position={[1.5, 1.5, -1]} intensity={0.6} color="#7209b7" />
-    <hemisphereLight args={['#b0d4f1', '#1a1a2e', 0.8]} />
+    <ambientLight intensity={2.0} color="#fff8e7" />
+    <directionalLight position={[5, 8, 3]} intensity={2.5} color="#ffecd2" castShadow />
+    <pointLight position={[0, 2.5, 0]} intensity={1.2} color="#ffffff" />
+    <pointLight position={[0, 1.5, 4]} intensity={1.5} color="#ffd89b" />
+    <pointLight position={[-1.5, 1.5, -1]} intensity={0.4} color="#87CEEB" />
+    <pointLight position={[1.5, 1.5, -1]} intensity={0.4} color="#98D8C8" />
+    <hemisphereLight args={['#87CEEB', '#F5E6CA', 1.2]} />
     <CabinModel />
     <CameraBob />
     <Html
@@ -53,7 +54,7 @@ const CabinScene3D = () => (
     >
       <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
     </Html>
-    <Environment preset="night" />
+    <Environment preset="sunset" />
     <OrbitControls
       makeDefault
       enablePan={false}
