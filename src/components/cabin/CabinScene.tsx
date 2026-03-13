@@ -62,7 +62,7 @@ const CameraController = () => {
       }
     }
     const cx = -0.25 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5;
-    const cy = 0.28 + offset.y + Math.sin(t * 0.8) * bobIntensity;
+    const cy = 0.35 + offset.y + Math.sin(t * 0.8) * bobIntensity;
     const cz = 0.15 + offset.z + joltZ;
     camera.position.set(cx, cy, cz);
 
