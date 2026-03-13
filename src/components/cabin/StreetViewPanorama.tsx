@@ -34,7 +34,7 @@ const StreetViewPanorama = () => {
       .then((r) => r.json())
       .then(async (data) => {
         if (data?.waypoints) {
-          data.waypoints = densifyWaypoints(data.waypoints, 5);
+          data.waypoints = densifyWaypoints(data.waypoints, 15);
         }
         routeDataRef.current = data;
         const wp = data?.waypoints?.[0];
