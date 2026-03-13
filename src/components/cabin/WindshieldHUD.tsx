@@ -100,7 +100,7 @@ const WindshieldHUD = () => {
   });
 
   return (
-    <mesh ref={meshRef} position={[0, 1.6, -2.5]} rotation={[-0.1, 0, 0]}>
+    <mesh ref={meshRef} position={[0, 1.3, 2.5]} rotation={[-0.1, Math.PI, 0]}>
       <planeGeometry args={[3.2, 1]} />
       <meshBasicMaterial
         map={canvas.texture}
