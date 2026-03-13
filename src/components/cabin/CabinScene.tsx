@@ -137,7 +137,7 @@ const CabinScene = ({
     <div className="w-full h-screen" style={{ background: 'hsl(220, 20%, 4%)' }}>
       <Canvas
         camera={{
-          position: [0, 1.3, 0.5],
+          position: [0, 0.85, -0.3],
           fov: 65,
           near: 0.1,
           far: 1000,
