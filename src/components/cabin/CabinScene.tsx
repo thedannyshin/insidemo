@@ -176,7 +176,8 @@ const CabinScene3D = ({
       </div>
     </Html>
   </>
-);
+  );
+};
 
 const CabinScene = ({
   onStartRide,
