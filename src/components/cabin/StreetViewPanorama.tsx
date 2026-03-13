@@ -14,40 +14,6 @@ const lerpAngle = (a: number, b: number, t: number) => {
   return a + diff * t;
 };
 
-/** Haversine distance in meters */
-const haversineDist = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
-  const R = 6371000;
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-  const sinLat = Math.sin(dLat / 2);
-  const sinLng = Math.sin(dLng / 2);
-  const h = sinLat * sinLat + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinLng * sinLng;
-  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
-};
-
-/** Densify waypoints to ~targetSpacing meters apart via linear interpolation */
-const densifyWaypoints = (waypoints: any[], targetSpacing = 10) => {
-  if (waypoints.length < 2) return waypoints;
-  const result = [waypoints[0]];
-  for (let i = 1; i < waypoints.length; i++) {
-    const prev = waypoints[i - 1];
-    const curr = waypoints[i];
-    const dist = haversineDist(prev, curr);
-    const segments = Math.max(1, Math.round(dist / targetSpacing));
-    for (let s = 1; s <= segments; s++) {
-      const t = s / segments;
-      result.push({
-        lat: lerp(prev.lat, curr.lat, t),
-        lng: lerp(prev.lng, curr.lng, t),
-        heading: lerpAngle(prev.heading ?? 0, curr.heading ?? 0, t),
-        speed: lerp(prev.speed ?? 20, curr.speed ?? 20, t),
-        eta: lerp(prev.eta ?? 0, curr.eta ?? 0, t),
-      });
-    }
-  }
-  return result;
-};
-
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
@@ -66,10 +32,6 @@ const StreetViewPanorama = () => {
     fetch('/data/route.json')
       .then((r) => r.json())
       .then(async (data) => {
-        // Densify waypoints to ~10m spacing for ultra-smooth movement
-        if (data?.waypoints) {
-          data.waypoints = densifyWaypoints(data.waypoints, 10);
-        }
         routeDataRef.current = data;
         const wp = data?.waypoints?.[0];
         const lat = wp?.lat ?? 37.7855;
@@ -121,8 +83,8 @@ const StreetViewPanorama = () => {
     const finalHeading = ((iHeading - headingOffsetDeg) % 360 + 360) % 360;
     const finalPitch = pitchOffsetDeg * 0.5;
 
-    // Only send position update when moved enough (~15m) to avoid constant pano-snapping
-    const MIN_DIST = 0.00015; // ~15m in degrees
+    // Only send position update when moved enough (~30m) to avoid constant pano-snapping
+    const MIN_DIST = 0.0003; // ~30m in degrees
     const lastPos = lastSentPos.current;
     const needsPositionUpdate =
       !lastPos ||
