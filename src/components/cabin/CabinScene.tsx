@@ -8,7 +8,7 @@ import { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewPanorama from './StreetViewPanorama';
 import { useRideStore } from '@/store/rideStore';
-import CameraDebugSliders, { useCameraBase } from './CameraDebugSliders';
+import { useCameraBase } from './CameraDebugSliders';
 
 const CameraController = () => {
   const baseX = useCameraBase((s) => s.baseX);
@@ -187,7 +187,6 @@ const CabinScene = ({
   onReplay: () => void;
 }) => (
   <div className="w-full h-screen relative" style={{ background: '#000' }}>
-    <CameraDebugSliders />
     {/* Street View panorama as full background */}
     <StreetViewPanorama />
 
