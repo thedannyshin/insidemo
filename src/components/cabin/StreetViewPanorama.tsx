@@ -3,6 +3,7 @@ import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
@@ -11,17 +12,17 @@ const StreetViewPanorama = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeDataRef = useRef<any>(null);
   const lastWpIndexRef = useRef(-1);
-  const [iframeSrc, setIframeSrc] = useState<string | null>(null);
+  const [srcdoc, setSrcdoc] = useState<string | null>(null);
 
   const postToIframe = useCallback((msg: Record<string, unknown>) => {
     iframeRef.current?.contentWindow?.postMessage(msg, '*');
   }, []);
 
-  // Load route data, then set initial iframe src
+  // Load route data, then fetch HTML from edge function and use as srcdoc
   useEffect(() => {
     fetch('/data/route.json')
       .then((r) => r.json())
-      .then((data) => {
+      .then(async (data) => {
         routeDataRef.current = data;
         const wp = data?.waypoints?.[0];
         const lat = wp?.lat ?? 37.7855;
@@ -31,14 +32,24 @@ const StreetViewPanorama = () => {
           lat: String(lat), lng: String(lng),
           heading: String(Math.round(heading)), pitch: '0',
         });
-        setIframeSrc(`${SUPABASE_URL}/functions/v1/streetview-pano?${params.toString()}`);
+        const url = `${SUPABASE_URL}/functions/v1/streetview-pano?${params.toString()}`;
+        const res = await fetch(url, {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+        });
+        if (res.ok) {
+          const html = await res.text();
+          setSrcdoc(html);
+        }
       });
   }, []);
 
   // Update position/pov based on progress and camera rotation
   useEffect(() => {
     const rd = routeDataRef.current;
-    if (!rd?.waypoints?.length) return;
+    if (!rd?.waypoints?.length || !srcdoc) return;
 
     const waypoints = rd.waypoints;
     const wpIndex = Math.min(
@@ -66,9 +77,9 @@ const StreetViewPanorama = () => {
         heading: finalHeading, pitch: finalPitch,
       });
     }
-  }, [routeProgress, phase, rotation.h, rotation.v, postToIframe]);
+  }, [routeProgress, phase, rotation.h, rotation.v, postToIframe, srcdoc]);
 
-  if (!iframeSrc) {
+  if (!srcdoc) {
     return <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#111' }} />;
   }
 
@@ -76,7 +87,7 @@ const StreetViewPanorama = () => {
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#111', overflow: 'hidden' }}>
       <iframe
         ref={iframeRef}
-        src={iframeSrc}
+        srcDoc={srcdoc}
         style={{ position: 'absolute', width: '100%', height: '100%', border: 'none' }}
         allow="accelerometer; gyroscope"
         title="Street View"
