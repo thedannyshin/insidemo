@@ -1,0 +1,72 @@
+import { create } from 'zustand';
+
+interface CameraOffsetState {
+  offset: { x: number; y: number; z: number };
+  move: (dx: number, dy: number, dz: number) => void;
+  reset: () => void;
+}
+
+export const useCameraOffset = create<CameraOffsetState>((set) => ({
+  offset: { x: 0, y: 0, z: 0 },
+  move: (dx, dy, dz) =>
+    set((s) => ({
+      offset: {
+        x: Math.max(-1.2, Math.min(1.2, s.offset.x + dx)),
+        y: Math.max(-0.4, Math.min(0.6, s.offset.y + dy)),
+        z: Math.max(-1.5, Math.min(1.5, s.offset.z + dz)),
+      },
+    })),
+  reset: () => set({ offset: { x: 0, y: 0, z: 0 } }),
+}));
+
+const step = 0.15;
+
+const btn = (label: string, onDown: () => void) => (
+  <button
+    key={label}
+    onPointerDown={(e) => { e.stopPropagation(); onDown(); }}
+    className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold select-none active:scale-90 transition-transform"
+    style={{
+      background: 'hsl(220 20% 15% / 0.85)',
+      border: '1px solid hsl(195 80% 50% / 0.3)',
+      color: 'hsl(195 100% 70%)',
+      backdropFilter: 'blur(8px)',
+    }}
+  >
+    {label}
+  </button>
+);
+
+const CameraDPad = () => {
+  const move = useCameraOffset((s) => s.move);
+  const reset = useCameraOffset((s) => s.reset);
+
+  return (
+    <div className="flex flex-col items-center gap-1" style={{ pointerEvents: 'auto' }}>
+      <div className="text-[8px] tracking-widest uppercase mb-0.5" style={{ color: 'hsl(195 80% 60%)' }}>
+        Camera
+      </div>
+      {/* Up */}
+      <div className="flex gap-1">
+        {btn('↑', () => move(0, step, 0))}
+      </div>
+      {/* Left / Reset / Right */}
+      <div className="flex gap-1">
+        {btn('←', () => move(-step, 0, 0))}
+        {btn('●', reset)}
+        {btn('→', () => move(step, 0, 0))}
+      </div>
+      {/* Down */}
+      <div className="flex gap-1">
+        {btn('↓', () => move(0, -step, 0))}
+      </div>
+      {/* Forward / Back */}
+      <div className="flex gap-1 mt-0.5">
+        {btn('▲', () => move(0, 0, step))}
+        {btn('▼', () => move(0, 0, -step))}
+      </div>
+    </div>
+  );
+};
+
+export default CameraDPad;

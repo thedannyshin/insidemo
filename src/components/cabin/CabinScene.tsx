@@ -1,32 +1,37 @@
 import { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Html, OrbitControls, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import LeftScreen from './LeftScreen';
 import RightScreen from './RightScreen';
+import CameraDPad, { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewWindow from './StreetViewWindow';
 import { useRideStore } from '@/store/rideStore';
 
-const CameraBob = () => {
-  const groupRef = useRef<THREE.Group>(null);
+const CameraController = () => {
+  const offset = useCameraOffset((s) => s.offset);
+  const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
 
   useFrame(({ clock }) => {
-    if (!groupRef.current) return;
     const t = clock.getElapsedTime();
     const bobIntensity = phase === 'riding' ? 0.008 : 0.004;
-    groupRef.current.position.y = Math.sin(t * 0.8) * bobIntensity;
-    groupRef.current.position.x = Math.sin(t * 0.5) * bobIntensity * 0.5;
+    let joltZ = 0;
     if (activeIncident?.cameraJolt && activeIncident.active) {
       const elapsed = (Date.now() - activeIncident.startTime) / 1000;
       if (elapsed < 0.5) {
-        groupRef.current.position.z = Math.sin(elapsed * 20) * 0.03 * (1 - elapsed * 2);
+        joltZ = Math.sin(elapsed * 20) * 0.03 * (1 - elapsed * 2);
       }
     }
+    camera.position.set(
+      0 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5,
+      1.0 + offset.y + Math.sin(t * 0.8) * bobIntensity,
+      -0.3 + offset.z + joltZ,
+    );
   });
-  return <group ref={groupRef} />;
+  return null;
 };
 
 const CabinModel = () => {
@@ -45,7 +50,7 @@ const CabinScene3D = () => (
     <pointLight position={[1.5, 1.5, -1]} intensity={1.0} color="#98D8C8" />
     <hemisphereLight args={['#87CEEB', '#F5E6CA', 2.0]} />
     <CabinModel />
-    <CameraBob />
+    <CameraController />
     <Html
       position={[0, 1.4, 4]}
       rotation={[0, Math.PI, 0]}
@@ -84,6 +89,11 @@ const CabinScene = ({
     >
       <CabinScene3D />
     </Canvas>
+
+    {/* Camera D-Pad */}
+    <div className="absolute top-4 left-4 z-50">
+      <CameraDPad />
+    </div>
 
     {/* 2D Dashboard overlay */}
     <div
