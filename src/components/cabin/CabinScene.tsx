@@ -1,12 +1,12 @@
 import { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, Html, Environment } from '@react-three/drei';
+import { useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import LeftScreen from './LeftScreen';
 import RightScreen from './RightScreen';
-import CameraDPad, { useCameraOffset } from './CameraControls';
+import { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
-import StreetViewWindow from './StreetViewWindow';
+import StreetViewPanorama from './StreetViewPanorama';
 import { useRideStore } from '@/store/rideStore';
 
 const CameraController = () => {
@@ -97,13 +97,13 @@ const CabinModel = () => {
 
       if (isGlass || (mat.opacity !== undefined && mat.opacity < 0.9 && mat.opacity > 0)) {
         mat.transparent = true;
-        mat.opacity = 0.15;
+        mat.opacity = 0.08;
         mat.depthWrite = false;
         mat.side = THREE.DoubleSide;
         mat.color = new THREE.Color('#aaddff');
         mat.roughness = 0.05;
         mat.metalness = 0.1;
-        mat.envMapIntensity = 2.0;
+        mat.envMapIntensity = 1.0;
         mat.needsUpdate = true;
       }
     });
@@ -120,37 +120,14 @@ const CabinScene3D = ({
   onReplay: () => void;
 }) => (
   <>
-    <ambientLight intensity={3.5} color="#fff8e7" />
-    <directionalLight position={[5, 10, 5]} intensity={4.0} color="#ffecd2" castShadow />
-    <directionalLight position={[-3, 6, 8]} intensity={2.0} color="#87CEEB" />
-    <pointLight position={[0, 2.5, 0]} intensity={2.0} color="#ffffff" />
-    <pointLight position={[0, 1.5, 4]} intensity={3.0} color="#ffd89b" />
-    <pointLight position={[-1.5, 1.5, -1]} intensity={1.0} color="#87CEEB" />
-    <pointLight position={[1.5, 1.5, -1]} intensity={1.0} color="#98D8C8" />
-    <hemisphereLight args={['#87CEEB', '#F5E6CA', 2.0]} />
+    <ambientLight intensity={2.5} color="#fff8e7" />
+    <directionalLight position={[5, 10, 5]} intensity={2.0} color="#ffecd2" castShadow />
+    <directionalLight position={[-3, 6, 8]} intensity={1.0} color="#87CEEB" />
+    <pointLight position={[0, 2.5, 0]} intensity={1.5} color="#ffffff" />
+    <pointLight position={[0, 1.5, 4]} intensity={1.5} color="#ffd89b" />
+    <hemisphereLight args={['#87CEEB', '#F5E6CA', 1.0]} />
     <CabinModel />
     <CameraController />
-
-    {/* Windshield street view */}
-    <Html
-      position={[0, 0.62, -0.95]}
-      rotation={[-0.06, 0, 0]}
-      transform
-      scale={0.0036}
-      style={{ pointerEvents: 'none' }}
-    >
-      <div style={{ width: 1600, height: 900, borderRadius: 24, overflow: 'hidden', background: 'hsl(220 18% 8%)' }}>
-        <StreetViewWindow
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: 24,
-            opacity: 1,
-            filter: 'contrast(1.08) saturate(1.08)',
-          }}
-        />
-      </div>
-    </Html>
 
     {/* Combined dashboard panel */}
     <Html
@@ -182,8 +159,6 @@ const CabinScene3D = ({
         </div>
       </div>
     </Html>
-
-    <Environment preset="sunset" background blur={0.5} />
   </>
 );
 
@@ -194,11 +169,20 @@ const CabinScene = ({
   onStartRide: () => void;
   onReplay: () => void;
 }) => (
-  <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
+  <div className="w-full h-screen relative" style={{ background: '#000' }}>
+    {/* Street View panorama as full background */}
+    <StreetViewPanorama />
+
+    {/* 3D cabin overlay with transparent background */}
     <Canvas
       camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
-      gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
-      className="absolute inset-0"
+      gl={{
+        antialias: true,
+        toneMapping: THREE.ACESFilmicToneMapping,
+        toneMappingExposure: 1.8,
+        alpha: true,
+      }}
+      style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'transparent' }}
     >
       <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
