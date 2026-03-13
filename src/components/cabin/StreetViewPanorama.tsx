@@ -1,9 +1,8 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const StreetViewPanorama = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -12,6 +11,7 @@ const StreetViewPanorama = () => {
   const rotation = useCameraOffset((s) => s.rotation);
   const routeDataRef = useRef<any>(null);
   const baseHeadingRef = useRef(315);
+  const iframeReady = useRef(false);
 
   // Load route data
   useEffect(() => {
@@ -20,11 +20,15 @@ const StreetViewPanorama = () => {
       .then((data) => { routeDataRef.current = data; });
   }, []);
 
+  // Mark iframe as ready after load
+  const handleIframeLoad = () => {
+    iframeReady.current = true;
+  };
+
   // Sync camera rotation to panorama POV
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe?.contentWindow) return;
-    // Convert camera horizontal rotation to heading offset (in degrees)
+    if (!iframe?.contentWindow || !iframeReady.current) return;
     const headingOffset = (rotation.h * 180) / Math.PI;
     const pitchOffset = (rotation.v * 180) / Math.PI;
     iframe.contentWindow.postMessage({
@@ -38,7 +42,7 @@ const StreetViewPanorama = () => {
   useEffect(() => {
     const iframe = iframeRef.current;
     const rd = routeDataRef.current;
-    if (!iframe?.contentWindow || !rd?.waypoints?.length) return;
+    if (!iframe?.contentWindow || !iframeReady.current || !rd?.waypoints?.length) return;
 
     const waypoints = rd.waypoints;
     const wpIndex = Math.min(
@@ -65,16 +69,24 @@ const StreetViewPanorama = () => {
     }, '*');
   }, [routeProgress, phase]);
 
-  const firstWp = routeDataRef.current?.waypoints?.[0];
-  const initLat = firstWp?.lat || 37.7855;
-  const initLng = firstWp?.lng || -122.4057;
+  // Listen for POV changes from the iframe (user dragging inside panorama)
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'pov_changed') {
+        // Could sync back to camera rotation here if needed
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
 
-  const panoUrl = `${SUPABASE_URL}/functions/v1/streetview-pano?lat=${initLat}&lng=${initLng}&heading=315&pitch=0`;
+  const panoUrl = `${SUPABASE_URL}/functions/v1/streetview-pano?lat=37.7855&lng=-122.4057&heading=315&pitch=0`;
 
   return (
     <iframe
       ref={iframeRef}
       src={panoUrl}
+      onLoad={handleIframeLoad}
       style={{
         position: 'absolute',
         inset: 0,

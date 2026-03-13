@@ -23,11 +23,8 @@ const CameraController = () => {
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName !== 'CANVAS') return;
       isDragging.current = true;
       lastPointer.current = { x: e.clientX, y: e.clientY };
-      e.preventDefault();
     };
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging.current) return;
@@ -173,7 +170,7 @@ const CabinScene = ({
     {/* Street View panorama as full background */}
     <StreetViewPanorama />
 
-    {/* 3D cabin overlay with transparent background */}
+    {/* 3D cabin overlay with transparent background — pointer-events:none so drag goes to iframe */}
     <Canvas
       camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
       gl={{
@@ -182,7 +179,7 @@ const CabinScene = ({
         toneMappingExposure: 1.8,
         alpha: true,
       }}
-      style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'transparent' }}
+      style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'transparent', pointerEvents: 'none' }}
     >
       <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
