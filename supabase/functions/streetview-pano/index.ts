@@ -47,9 +47,9 @@ function lerpAngle(a,b,t){
 function animatePov(){
   var dh=Math.abs(((targetPov.heading-currentPov.heading+540)%360)-180);
   var dp=Math.abs(targetPov.pitch-currentPov.pitch);
-  if(dh>0.1||dp>0.1){
-    currentPov.heading=lerpAngle(currentPov.heading,targetPov.heading,0.15);
-    currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.15;
+  if(dh>0.05||dp>0.05){
+    currentPov.heading=lerpAngle(currentPov.heading,targetPov.heading,0.1);
+    currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.1;
     pano.setPov(currentPov);
   }
   povAnimFrame=requestAnimationFrame(animatePov);
