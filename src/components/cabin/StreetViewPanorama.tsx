@@ -116,7 +116,7 @@ const StreetViewPanorama = () => {
               authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             },
             body: JSON.stringify({
-              waypoints: waypoints.map((w: any) => ({ lat: w.lat, lng: w.lng })),
+              waypoints: waypoints.map((w: any) => ({ lat: w.lat, lng: w.lng, heading: w.heading })),
             }),
           });
           if (res.ok) {
