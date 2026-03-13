@@ -93,6 +93,7 @@ const initialMusic: MusicState = {
 
 export const useRideStore = create<RideState>((set) => ({
   phase: 'pre-ride',
+  viewMode: 'cabin',
   passengerName: 'Alex',
   destination: '',
   cabinMode: 'entertainment',
