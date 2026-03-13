@@ -7,6 +7,36 @@ import RightScreen from './RightScreen';
 import CameraDPad, { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewWindow from './StreetViewWindow';
+
+const DashboardScreen = ({ children, position, rotation, width, height }: {
+  children: React.ReactNode;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  width: number;
+  height: number;
+}) => (
+  <Html
+    position={position}
+    rotation={rotation}
+    transform
+    scale={0.0045}
+    style={{ pointerEvents: 'auto' }}
+  >
+    <div
+      style={{
+        width,
+        height,
+        borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
+        border: '1px solid hsl(220 15% 20% / 0.4)',
+        background: 'hsl(220 18% 8%)',
+      }}
+    >
+      {children}
+    </div>
+  </Html>
+);
 import { useRideStore } from '@/store/rideStore';
 
 const CameraController = () => {
