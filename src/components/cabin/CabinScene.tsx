@@ -133,13 +133,22 @@ const CabinScene3D = ({
 
     {/* Windshield street view */}
     <Html
-      position={[0, 1.4, 4]}
-      rotation={[0, Math.PI, 0]}
+      position={[0, 0.96, -1.55]}
+      rotation={[-0.1, 0, 0]}
       transform
-      scale={0.008}
+      scale={0.0032}
       style={{ pointerEvents: 'none' }}
     >
-      <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
+      <StreetViewWindow
+        style={{
+          width: 1600,
+          height: 900,
+          borderRadius: 24,
+          opacity: 1,
+          background: 'hsl(220 18% 8%)',
+          filter: 'contrast(1.08) saturate(1.08)',
+        }}
+      />
     </Html>
 
     {/* Combined dashboard panel */}

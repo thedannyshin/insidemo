@@ -19,7 +19,7 @@ const StreetViewWindow = ({ className, style }: { className?: string; style?: Re
 
   // Compute initial coords
   const initialUrl = useMemo(() => {
-    return `${SUPABASE_URL}/functions/v1/streetview?lat=37.7855&lng=-122.4057&heading=315`;
+    return `${SUPABASE_URL}/functions/v1/streetview?lat=37.7855&lng=-122.4057&heading=315&pitch=0`;
   }, []);
 
   // Update Street View position as ride progresses
@@ -36,14 +36,15 @@ const StreetViewWindow = ({ className, style }: { className?: string; style?: Re
     // Calculate heading from current to next waypoint
     const dLng = nextWp.lng - wp.lng;
     const dLat = nextWp.lat - wp.lat;
-    const heading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
+    const rawHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
+    const heading = ((rawHeading % 360) + 360) % 360;
 
     const key = `${wp.lat},${wp.lng}`;
     if (key === lastSentRef.current) return;
     lastSentRef.current = key;
 
     iframeRef.current?.contentWindow?.postMessage(
-      JSON.stringify({ lat: wp.lat, lng: wp.lng, heading }),
+      JSON.stringify({ lat: wp.lat, lng: wp.lng, heading, pitch: 0 }),
       '*'
     );
   }, [routeProgress, phase]);
