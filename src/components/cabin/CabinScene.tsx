@@ -144,10 +144,10 @@ const CabinScene3D = ({
 
     {/* Dashboard HUD - center top of dashboard */}
     <Html
-      position={[0, 0.18, -0.55]}
-      rotation={[-0.25, 0, 0]}
+      position={[0, 0.22, -0.5]}
+      rotation={[-0.3, 0, 0]}
       transform
-      scale={0.0028}
+      scale={0.012}
       style={{ pointerEvents: 'auto' }}
     >
       <HUDOverlay />
@@ -155,10 +155,10 @@ const CabinScene3D = ({
 
     {/* Left dashboard screen */}
     <Html
-      position={[-0.42, 0.12, -0.35]}
-      rotation={[-0.3, 0.25, 0]}
+      position={[-0.5, 0.18, -0.3]}
+      rotation={[-0.35, 0.3, 0]}
       transform
-      scale={0.0032}
+      scale={0.014}
       style={{ pointerEvents: 'auto' }}
     >
       <div style={{
@@ -172,10 +172,10 @@ const CabinScene3D = ({
 
     {/* Right dashboard screen */}
     <Html
-      position={[0.42, 0.12, -0.35]}
-      rotation={[-0.3, -0.25, 0]}
+      position={[0.5, 0.18, -0.3]}
+      rotation={[-0.35, -0.3, 0]}
       transform
-      scale={0.0032}
+      scale={0.014}
       style={{ pointerEvents: 'auto' }}
     >
       <div style={{
