@@ -27,7 +27,12 @@ export function useRideEngine() {
       .then((data) => setIncidents(data.incidents));
     fetch('/data/route.json')
       .then((r) => r.json())
-      .then((data) => { routeDataRef.current = data; });
+      .then((data) => {
+        if (data?.waypoints) {
+          data.waypoints = densifyWaypoints(data.waypoints, 5);
+        }
+        routeDataRef.current = data;
+      });
   }, [setIncidents]);
 
   const speakExplanation = useCallback((text: string) => {
