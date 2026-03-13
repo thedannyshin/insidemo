@@ -2,12 +2,15 @@ import { create } from 'zustand';
 
 interface CameraOffsetState {
   offset: { x: number; y: number; z: number };
+  rotation: { h: number; v: number }; // horizontal & vertical look angles
   move: (dx: number, dy: number, dz: number) => void;
+  rotate: (dh: number, dv: number) => void;
   reset: () => void;
 }
 
 export const useCameraOffset = create<CameraOffsetState>((set) => ({
   offset: { x: 0, y: 0, z: 0 },
+  rotation: { h: 0, v: 0 },
   move: (dx, dy, dz) =>
     set((s) => ({
       offset: {
@@ -16,7 +19,14 @@ export const useCameraOffset = create<CameraOffsetState>((set) => ({
         z: Math.max(-1.5, Math.min(1.5, s.offset.z + dz)),
       },
     })),
-  reset: () => set({ offset: { x: 0, y: 0, z: 0 } }),
+  rotate: (dh, dv) =>
+    set((s) => ({
+      rotation: {
+        h: Math.max(-Math.PI * 0.45, Math.min(Math.PI * 0.45, s.rotation.h + dh)),
+        v: Math.max(-0.4, Math.min(0.5, s.rotation.v + dv)),
+      },
+    })),
+  reset: () => set({ offset: { x: 0, y: 0, z: 0 }, rotation: { h: 0, v: 0 } }),
 }));
 
 const step = 0.15;
