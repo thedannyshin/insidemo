@@ -10,7 +10,7 @@ const LeftScreen = () => {
       className={`insidemo-screen w-full h-full relative transition-all duration-400 ${
         isDimmed ? 'insidemo-incident-dim' : ''
       }`}
-      style={{ width: 320, height: 200, padding: 16 }}
+      style={{ width: '100%', height: '100%', padding: 16 }}
     >
       {phase === 'pre-ride' && <PreRideView name={passengerName} />}
       {(phase === 'takeoff' || phase === 'riding') && (
