@@ -11,6 +11,10 @@ interface CameraBaseState {
   hudZ: number;
   hudRotX: number;
   hudScale: number;
+  videoMaxH: number;
+  videoMaxV: number;
+  videoHeadingOffset: number;
+  videoInvertH: number;
   setBase: (axis: string, value: number) => void;
 }
 
@@ -25,6 +29,10 @@ export const useCameraBase = create<CameraBaseState>((set) => ({
   hudZ: -0.26,
   hudRotX: -0.04,
   hudScale: 0.052,
+  videoMaxH: 60,
+  videoMaxV: 20,
+  videoHeadingOffset: 220,
+  videoInvertH: 1,
   setBase: (axis, value) => set({ [axis]: value }),
 }));
 
