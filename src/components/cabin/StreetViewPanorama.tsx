@@ -76,7 +76,7 @@ const StreetViewPanorama = () => {
     const rotationH = (rotation.h / maxCabinH) * maxVideoH;
     const rotationV = (rotation.v / maxCabinV) * maxVideoV;
 
-    const finalHeading = ((iHeading + 220 - rotationH) % 360 + 360) % 360;
+    const finalHeading = ((iHeading + 220 + rotationH) % 360 + 360) % 360;
     const finalPitch = rotationV;
 
     postToIframe({
