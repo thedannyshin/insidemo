@@ -23,14 +23,16 @@ const HUDOverlay = () => {
       style={{
         width: 740,
         padding: '10px 24px',
-        background: 'hsl(220 20% 6% / 0.85)',
-        backdropFilter: 'blur(24px)',
+        background: 'linear-gradient(180deg, hsl(220 18% 12%) 0%, hsl(220 20% 6%) 100%)',
         border: isAlert
-          ? `1px solid ${alertColor}40`
-          : '1px solid hsl(220 15% 20% / 0.3)',
+          ? `1.5px solid ${alertColor}40`
+          : '1.5px solid hsl(220 15% 22% / 0.5)',
+        borderTop: isAlert
+          ? `1.5px solid ${alertColor}60`
+          : '1.5px solid hsl(220 15% 30% / 0.6)',
         boxShadow: isAlert
-          ? `0 0 40px -10px ${alertColor}40, inset 0 1px 0 hsl(220 15% 25% / 0.2)`
-          : '0 0 30px -5px hsl(195 100% 50% / 0.1), inset 0 1px 0 hsl(220 15% 25% / 0.2)',
+          ? `0 0 40px -10px ${alertColor}40, 0 6px 20px -4px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 hsl(220 15% 28% / 0.4), inset 0 -1px 0 hsl(220 15% 5% / 0.6)`
+          : '0 0 30px -5px hsl(195 100% 50% / 0.1), 0 6px 20px -4px rgba(0,0,0,0.7), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 hsl(220 15% 28% / 0.4), inset 0 -1px 0 hsl(220 15% 5% / 0.6)',
         transition: 'border-color 0.3s, box-shadow 0.3s',
       }}
     >
