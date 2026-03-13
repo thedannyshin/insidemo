@@ -21,7 +21,7 @@ export interface Waypoint {
  * Densify a waypoint array by inserting interpolated points between each pair.
  * `factor` controls how many sub-segments per original segment (e.g., 5 = 5x more points).
  */
-export function densifyWaypoints(waypoints: Waypoint[], factor = 5): Waypoint[] {
+export function densifyWaypoints(waypoints: Waypoint[], factor = 15): Waypoint[] {
   if (waypoints.length < 2) return waypoints;
 
   const result: Waypoint[] = [];

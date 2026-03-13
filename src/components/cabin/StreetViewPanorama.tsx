@@ -34,7 +34,7 @@ const StreetViewPanorama = () => {
       .then((r) => r.json())
       .then(async (data) => {
         if (data?.waypoints) {
-          data.waypoints = densifyWaypoints(data.waypoints, 5);
+          data.waypoints = densifyWaypoints(data.waypoints, 15);
         }
         routeDataRef.current = data;
         const wp = data?.waypoints?.[0];
@@ -88,7 +88,7 @@ const StreetViewPanorama = () => {
     const finalPitch = pitchOffsetDeg * 0.5;
 
     // Only send position update when moved enough (~30m) to avoid constant pano-snapping
-    const MIN_DIST = 0.00015; // ~15m in degrees for denser waypoints
+    const MIN_DIST = 0.0002; // ~20m — sweet spot between smoothness and pano availability
     const lastPos = lastSentPos.current;
     const needsPositionUpdate =
       !lastPos ||

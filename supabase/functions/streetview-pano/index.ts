@@ -28,8 +28,8 @@ serve(async (req) => {
 <style>
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#000}
-#pano{width:100%;height:100%;transition:opacity 0.4s ease}
-#pano.fading{opacity:0.6}
+#pano{width:100%;height:100%;transition:opacity 0.5s ease-in-out}
+#pano.fading{opacity:0.7}
 </style>
 </head>
 <body>
@@ -47,9 +47,9 @@ function lerpAngle(a,b,t){
 function animatePov(){
   var dh=Math.abs(((targetPov.heading-currentPov.heading+540)%360)-180);
   var dp=Math.abs(targetPov.pitch-currentPov.pitch);
-  if(dh>0.1||dp>0.1){
-    currentPov.heading=lerpAngle(currentPov.heading,targetPov.heading,0.15);
-    currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.15;
+  if(dh>0.05||dp>0.05){
+    currentPov.heading=lerpAngle(currentPov.heading,targetPov.heading,0.1);
+    currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.1;
     pano.setPov(currentPov);
   }
   povAnimFrame=requestAnimationFrame(animatePov);
@@ -85,7 +85,7 @@ function initPano(){
       panoEl.classList.add("fading");
       pano.setPosition({lat:e.data.lat,lng:e.data.lng});
       clearTimeout(fadeTimer);
-      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},150);
+      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},300);
     }
     if(e.data.type==="update_all"){
       // Crossfade on position change
@@ -94,7 +94,7 @@ function initPano(){
       targetPov.heading=e.data.heading||0;
       targetPov.pitch=e.data.pitch||0;
       clearTimeout(fadeTimer);
-      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},150);
+      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},300);
     }
   });
 }
