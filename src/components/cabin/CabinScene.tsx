@@ -112,7 +112,13 @@ const CabinModel = () => {
   return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
-const CabinScene3D = () => (
+const CabinScene3D = ({
+  onStartRide,
+  onReplay,
+}: {
+  onStartRide: () => void;
+  onReplay: () => void;
+}) => (
   <>
     <ambientLight intensity={3.5} color="#fff8e7" />
     <directionalLight position={[5, 10, 5]} intensity={4.0} color="#ffecd2" castShadow />
@@ -124,6 +130,8 @@ const CabinScene3D = () => (
     <hemisphereLight args={['#87CEEB', '#F5E6CA', 2.0]} />
     <CabinModel />
     <CameraController />
+
+    {/* Windshield street view */}
     <Html
       position={[0, 1.4, 4]}
       rotation={[0, Math.PI, 0]}
@@ -133,6 +141,52 @@ const CabinScene3D = () => (
     >
       <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
     </Html>
+
+    {/* Dashboard HUD - center top of dashboard */}
+    <Html
+      position={[0, 0.18, -0.55]}
+      rotation={[-0.25, 0, 0]}
+      transform
+      scale={0.0028}
+      style={{ pointerEvents: 'auto' }}
+    >
+      <HUDOverlay />
+    </Html>
+
+    {/* Left dashboard screen */}
+    <Html
+      position={[-0.42, 0.12, -0.35]}
+      rotation={[-0.3, 0.25, 0]}
+      transform
+      scale={0.0032}
+      style={{ pointerEvents: 'auto' }}
+    >
+      <div style={{
+        width: 360, height: 200, borderRadius: 12, overflow: 'hidden',
+        boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
+        border: '1px solid hsl(220 15% 20% / 0.4)', background: 'hsl(220 18% 8%)',
+      }}>
+        <LeftScreen />
+      </div>
+    </Html>
+
+    {/* Right dashboard screen */}
+    <Html
+      position={[0.42, 0.12, -0.35]}
+      rotation={[-0.3, -0.25, 0]}
+      transform
+      scale={0.0032}
+      style={{ pointerEvents: 'auto' }}
+    >
+      <div style={{
+        width: 360, height: 200, borderRadius: 12, overflow: 'hidden',
+        boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
+        border: '1px solid hsl(220 15% 20% / 0.4)', background: 'hsl(220 18% 8%)',
+      }}>
+        <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
+      </div>
+    </Html>
+
     <Environment preset="sunset" background blur={0.5} />
   </>
 );
@@ -150,60 +204,8 @@ const CabinScene = ({
       gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
       className="absolute inset-0"
     >
-      <CabinScene3D />
+      <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
-
-    {/* Dashboard overlay — styled as car interior console */}
-    <div
-      className="absolute bottom-0 left-0 right-0 z-50 flex flex-col items-center"
-      style={{ pointerEvents: 'none' }}
-    >
-      {/* Dashboard surface */}
-      <div
-        className="w-full flex flex-col items-center gap-2 px-6 pt-4 pb-3"
-        style={{
-          pointerEvents: 'none',
-          background: 'linear-gradient(180deg, transparent 0%, hsl(220 15% 8% / 0.6) 20%, hsl(220 12% 6% / 0.95) 100%)',
-        }}
-      >
-        {/* HUD bar */}
-        <div style={{ pointerEvents: 'auto' }}>
-          <HUDOverlay />
-        </div>
-
-        {/* Screens row — angled like dashboard panels */}
-        <div className="flex justify-center gap-3">
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{
-              pointerEvents: 'auto',
-              width: 360,
-              height: 200,
-              transform: 'perspective(800px) rotateY(8deg) rotateX(-2deg)',
-              boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.15), 0 4px 20px rgba(0,0,0,0.5)',
-              border: '1px solid hsl(220 15% 20% / 0.4)',
-              background: 'hsl(220 18% 8%)',
-            }}
-          >
-            <LeftScreen />
-          </div>
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{
-              pointerEvents: 'auto',
-              width: 360,
-              height: 200,
-              transform: 'perspective(800px) rotateY(-8deg) rotateX(-2deg)',
-              boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.15), 0 4px 20px rgba(0,0,0,0.5)',
-              border: '1px solid hsl(220 15% 20% / 0.4)',
-              background: 'hsl(220 18% 8%)',
-            }}
-          >
-            <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 );
 
