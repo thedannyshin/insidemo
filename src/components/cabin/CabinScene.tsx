@@ -77,6 +77,8 @@ const CameraController = () => {
     const ty = cy + rotation.v * lookDist;
     const tz = cz + Math.cos(rotation.h + Math.PI) * lookDist;
     camera.lookAt(tx, ty, tz);
+    (camera as THREE.PerspectiveCamera).fov = fov;
+    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
   });
   return null;
 };
