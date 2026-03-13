@@ -122,7 +122,14 @@ const CabinScene3D = ({
 }: {
   onStartRide: () => void;
   onReplay: () => void;
-}) => (
+}) => {
+  const hudX = useCameraBase((s) => s.hudX);
+  const hudY = useCameraBase((s) => s.hudY);
+  const hudZ = useCameraBase((s) => s.hudZ);
+  const hudRotX = useCameraBase((s) => s.hudRotX);
+  const hudScale = useCameraBase((s) => s.hudScale);
+
+  return (
   <>
     <ambientLight intensity={2.5} color="#fff8e7" />
     <directionalLight position={[5, 10, 5]} intensity={2.0} color="#ffecd2" castShadow />
