@@ -13,7 +13,7 @@ const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
   const isDragging = useRef(false);
