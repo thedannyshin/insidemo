@@ -9,25 +9,29 @@ import HUDOverlay from './HUDOverlay';
 import StreetViewWindow from './StreetViewWindow';
 import { useRideStore } from '@/store/rideStore';
 
-const CameraBob = () => {
-  const groupRef = useRef<THREE.Group>(null);
+const CameraController = () => {
+  const offset = useCameraOffset((s) => s.offset);
+  const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
 
   useFrame(({ clock }) => {
-    if (!groupRef.current) return;
     const t = clock.getElapsedTime();
     const bobIntensity = phase === 'riding' ? 0.008 : 0.004;
-    groupRef.current.position.y = Math.sin(t * 0.8) * bobIntensity;
-    groupRef.current.position.x = Math.sin(t * 0.5) * bobIntensity * 0.5;
+    let joltZ = 0;
     if (activeIncident?.cameraJolt && activeIncident.active) {
       const elapsed = (Date.now() - activeIncident.startTime) / 1000;
       if (elapsed < 0.5) {
-        groupRef.current.position.z = Math.sin(elapsed * 20) * 0.03 * (1 - elapsed * 2);
+        joltZ = Math.sin(elapsed * 20) * 0.03 * (1 - elapsed * 2);
       }
     }
+    camera.position.set(
+      0 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5,
+      1.0 + offset.y + Math.sin(t * 0.8) * bobIntensity,
+      -0.3 + offset.z + joltZ,
+    );
   });
-  return <group ref={groupRef} />;
+  return null;
 };
 
 const CabinModel = () => {
