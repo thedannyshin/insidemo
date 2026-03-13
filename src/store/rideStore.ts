@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 export type RidePhase = 'pre-ride' | 'takeoff' | 'riding' | 'arrived';
+export type ViewMode = 'cabin' | 'birdseye';
 export type CabinMode = 'entertainment' | 'business' | 'relax' | 'party';
 export type IncidentSeverity = 'alert' | 'caution' | 'info';
 
