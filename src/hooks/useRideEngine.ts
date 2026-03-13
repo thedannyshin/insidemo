@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useRideStore, Incident } from '@/store/rideStore';
+import { densifyWaypoints } from '@/lib/densifyRoute';
 
 type IncidentEvent = {
   incident: Incident;
@@ -26,7 +27,12 @@ export function useRideEngine() {
       .then((data) => setIncidents(data.incidents));
     fetch('/data/route.json')
       .then((r) => r.json())
-      .then((data) => { routeDataRef.current = data; });
+      .then((data) => {
+        if (data?.waypoints) {
+          data.waypoints = densifyWaypoints(data.waypoints, 5);
+        }
+        routeDataRef.current = data;
+      });
   }, [setIncidents]);
 
   const speakExplanation = useCallback((text: string) => {

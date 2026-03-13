@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
+import { densifyWaypoints } from '@/lib/densifyRoute';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -32,6 +33,9 @@ const StreetViewPanorama = () => {
     fetch('/data/route.json')
       .then((r) => r.json())
       .then(async (data) => {
+        if (data?.waypoints) {
+          data.waypoints = densifyWaypoints(data.waypoints, 5);
+        }
         routeDataRef.current = data;
         const wp = data?.waypoints?.[0];
         const lat = wp?.lat ?? 37.7855;
@@ -84,7 +88,7 @@ const StreetViewPanorama = () => {
     const finalPitch = pitchOffsetDeg * 0.5;
 
     // Only send position update when moved enough (~30m) to avoid constant pano-snapping
-    const MIN_DIST = 0.0003; // ~30m in degrees
+    const MIN_DIST = 0.00015; // ~15m in degrees for denser waypoints
     const lastPos = lastSentPos.current;
     const needsPositionUpdate =
       !lastPos ||
