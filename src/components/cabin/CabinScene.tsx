@@ -66,8 +66,8 @@ const CabinSceneContent = ({
 
       {/* Street View — behind windshield */}
       <Html
-        position={[0, 1.4, -4]}
-        rotation={[0, 0, 0]}
+        position={[0, 1.4, 4]}
+        rotation={[0, Math.PI, 0]}
         transform
         scale={0.008}
         style={{ pointerEvents: 'none' }}
