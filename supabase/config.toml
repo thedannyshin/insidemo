@@ -1,1 +1,4 @@
 project_id = "jhogayiygatkarpctiwy"
+
+[functions.streetview-pano]
+verify_jwt = false

@@ -1,9 +1,8 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const StreetViewPanorama = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
