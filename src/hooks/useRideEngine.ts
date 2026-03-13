@@ -1,6 +1,11 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useRideStore, Incident } from '@/store/rideStore';
 
+type IncidentEvent = {
+  incident: Incident;
+  fireAt: number; // absolute timestamp
+};
+
 export function useRideEngine() {
   const {
     phase, setPhase, speed, setSpeed, setEta, setCurrentStreet,
@@ -10,13 +15,18 @@ export function useRideEngine() {
   } = useRideStore();
 
   const frameRef = useRef<number>();
-  const incidentTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const incidentQueueRef = useRef<IncidentEvent[]>([]);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const routeDataRef = useRef<any>(null);
 
-  // Load route and incident data
+  // Load data
   useEffect(() => {
     fetch('/data/incidents.json')
       .then((r) => r.json())
       .then((data) => setIncidents(data.incidents));
+    fetch('/data/route.json')
+      .then((r) => r.json())
+      .then((data) => { routeDataRef.current = data; });
   }, [setIncidents]);
 
   const speakExplanation = useCallback((text: string) => {
@@ -26,34 +36,52 @@ export function useRideEngine() {
       utterance.rate = 0.9;
       utterance.pitch = 1.0;
       utterance.volume = 0.8;
+      // Try to find a more natural voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v =>
+        v.name.includes('Samantha') || v.name.includes('Google') || v.name.includes('Natural')
+      );
+      if (preferred) utterance.voice = preferred;
       window.speechSynthesis.speak(utterance);
     }
   }, []);
 
   const handleFireIncident = useCallback(
     (incident: Incident) => {
+      // Synchronized dispatch: all channels fire at once
+      const now = performance.now();
+
+      // 1. Visual: update store (HUD + card)
       fireIncident(incident);
+
+      // 2. Audio: voice narration
       speakExplanation(incident.voiceExplanation);
 
-      // Auto-dismiss after 6 seconds
-      const timer = setTimeout(() => {
+      // 3. Schedule auto-dismiss
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = setTimeout(() => {
         clearIncident();
       }, 6000);
-      incidentTimersRef.current.push(timer);
+
+      const latency = performance.now() - now;
+      if (latency > 16) console.warn(`[InsideMo] Incident dispatch took ${latency.toFixed(1)}ms`);
     },
     [fireIncident, clearIncident, speakExplanation]
   );
 
-  // Route waypoint simulation
-  const routeDataRef = useRef<any>(null);
+  // Event queue processor — checks queue every frame
+  const processQueue = useCallback((rideStart: number) => {
+    const now = Date.now();
+    const queue = incidentQueueRef.current;
 
-  useEffect(() => {
-    fetch('/data/route.json')
-      .then((r) => r.json())
-      .then((data) => {
-        routeDataRef.current = data;
-      });
-  }, []);
+    while (queue.length > 0 && queue[0].fireAt <= now) {
+      const event = queue.shift()!;
+      const state = useRideStore.getState();
+      if (!state.firedIncidentIds.includes(event.incident.id)) {
+        handleFireIncident(event.incident);
+      }
+    }
+  }, [handleFireIncident]);
 
   const startRide = useCallback(() => {
     const now = Date.now();
@@ -61,15 +89,21 @@ export function useRideEngine() {
     setPhase('takeoff');
     setMusic({ isPlaying: true });
 
-    // Speed ramp: 0 → cruising over 4 seconds
-    let rampStart = Date.now();
+    // Build sorted event queue
+    incidentQueueRef.current = incidents
+      .filter(inc => !firedIncidentIds.includes(inc.id))
+      .map(inc => ({ incident: inc, fireAt: now + inc.timestamp * 1000 }))
+      .sort((a, b) => a.fireAt - b.fireAt);
+
+    // Speed ramp
+    const rampStart = Date.now();
     const rampDuration = 4000;
     const targetSpeed = 25;
 
     const rampUp = () => {
       const elapsed = Date.now() - rampStart;
       const progress = Math.min(elapsed / rampDuration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setSpeed(Math.round(targetSpeed * eased));
 
       if (progress < 1) {
@@ -80,7 +114,7 @@ export function useRideEngine() {
       }
     };
     frameRef.current = requestAnimationFrame(rampUp);
-  }, [setPhase, setSpeed, setRideStartTime, setMusic]);
+  }, [setPhase, setSpeed, setRideStartTime, setMusic, incidents, firedIncidentIds]);
 
   const startRoutePlayback = useCallback(
     (startTime: number) => {
@@ -90,23 +124,15 @@ export function useRideEngine() {
       const totalTime = route.estimatedTime;
       const waypoints = route.waypoints;
 
-      // Schedule incidents
-      incidents.forEach((incident) => {
-        if (firedIncidentIds.includes(incident.id)) return;
-        const timer = setTimeout(() => {
-          handleFireIncident(incident);
-        }, incident.timestamp * 1000);
-        incidentTimersRef.current.push(timer);
-      });
-
-      // Animate route progress
       const tick = () => {
         const elapsed = (Date.now() - startTime) / 1000;
         const progress = Math.min(elapsed / totalTime, 1);
         setRideElapsed(elapsed);
         setRouteProgress(progress);
 
-        // Find current waypoint
+        // Process event queue
+        processQueue(startTime);
+
         const wpIndex = Math.min(
           Math.floor(progress * (waypoints.length - 1)),
           waypoints.length - 1
@@ -134,25 +160,23 @@ export function useRideEngine() {
       frameRef.current = requestAnimationFrame(tick);
     },
     [
-      incidents, firedIncidentIds, handleFireIncident,
-      setRideElapsed, setRouteProgress, setCurrentStreet,
+      processQueue, setRideElapsed, setRouteProgress, setCurrentStreet,
       setSpeed, setEta, setNextTurn, setPhase, setMusic,
     ]
   );
 
   const replayRide = useCallback(() => {
-    // Clear all timers
-    incidentTimersRef.current.forEach(clearTimeout);
-    incidentTimersRef.current = [];
+    incidentQueueRef.current = [];
+    if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     window.speechSynthesis?.cancel();
     resetRide();
   }, [resetRide]);
 
-  // Cleanup
   useEffect(() => {
     return () => {
-      incidentTimersRef.current.forEach(clearTimeout);
+      incidentQueueRef.current = [];
+      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
       window.speechSynthesis?.cancel();
     };

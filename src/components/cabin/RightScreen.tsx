@@ -326,29 +326,81 @@ const IncidentOverlay = ({
     caution: 'hsl(38 92% 50%)',
     info: 'hsl(195 100% 50%)',
   };
+  const icons: Record<string, string> = {
+    alert: '🛑',
+    caution: '⚠️',
+    info: 'ℹ️',
+  };
+  const labels: Record<string, string> = {
+    alert: 'SAFETY ALERT',
+    caution: 'CAUTION',
+    info: 'INFORMATION',
+  };
   const borderColor = colors[severity] || colors.info;
+
+  // Parse explanation into "Why" and "What's next"
+  const sentences = explanation.split('. ');
+  const why = sentences.slice(0, -1).join('. ') + '.';
+  const whatsNext = sentences[sentences.length - 1];
 
   return (
     <div
-      className="absolute top-2 left-2 right-2 insidemo-glass rounded-lg p-3 animate-slide-up cursor-pointer"
-      style={{ borderLeft: `3px solid ${borderColor}` }}
+      className="absolute inset-2 rounded-xl cursor-pointer animate-slide-up overflow-hidden"
+      style={{
+        background: 'hsl(220 20% 6% / 0.92)',
+        backdropFilter: 'blur(24px)',
+        border: `1px solid ${borderColor}40`,
+        boxShadow: `0 0 40px -10px ${borderColor}60, inset 0 1px 0 hsl(220 15% 25% / 0.3)`,
+      }}
       onClick={onTap}
     >
-      <div className="flex items-center gap-2 mb-1">
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ background: borderColor, boxShadow: `0 0 8px ${borderColor}` }}
-        />
-        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: borderColor }}>
-          {severity}
-        </span>
+      {/* Severity color bar */}
+      <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${borderColor}, transparent)` }} />
+
+      <div className="p-3 flex flex-col gap-2 h-full">
+        {/* Header */}
+        <div className="flex items-center gap-2">
+          <span className="text-base">{icons[severity] || icons.info}</span>
+          <span
+            className="text-[9px] font-bold uppercase tracking-[0.15em] insidemo-mono px-2 py-0.5 rounded-full"
+            style={{
+              color: borderColor,
+              background: `${borderColor}15`,
+              border: `1px solid ${borderColor}30`,
+            }}
+          >
+            {labels[severity] || labels.info}
+          </span>
+        </div>
+
+        {/* Headline */}
+        <p className="text-sm font-semibold leading-tight">{headline}</p>
+
+        {/* Why section */}
+        <div className="flex-1">
+          <p className="text-[9px] uppercase tracking-wider text-muted-foreground mb-0.5 insidemo-mono">Why</p>
+          <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(200, 220, 240, 0.75)' }}>
+            {why}
+          </p>
+        </div>
+
+        {/* What's next */}
+        {expanded && (
+          <div className="animate-slide-up">
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground mb-0.5 insidemo-mono">What's Next</p>
+            <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(200, 220, 240, 0.75)' }}>
+              {whatsNext}
+            </p>
+          </div>
+        )}
+
+        {/* Tap hint */}
+        {!expanded && (
+          <p className="text-[8px] text-muted-foreground/50 text-center insidemo-mono">
+            Tap for details
+          </p>
+        )}
       </div>
-      <p className="text-xs font-medium">{headline}</p>
-      {expanded && (
-        <p className="text-[10px] text-muted-foreground mt-1 animate-slide-up">
-          {explanation}
-        </p>
-      )}
     </div>
   );
 };
