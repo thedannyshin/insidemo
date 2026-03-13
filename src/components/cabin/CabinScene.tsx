@@ -7,6 +7,36 @@ import RightScreen from './RightScreen';
 import CameraDPad, { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewWindow from './StreetViewWindow';
+
+const DashboardScreen = ({ children, position, rotation, width, height }: {
+  children: React.ReactNode;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  width: number;
+  height: number;
+}) => (
+  <Html
+    position={position}
+    rotation={rotation}
+    transform
+    scale={0.0045}
+    style={{ pointerEvents: 'auto' }}
+  >
+    <div
+      style={{
+        width,
+        height,
+        borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
+        border: '1px solid hsl(220 15% 20% / 0.4)',
+        background: 'hsl(220 18% 8%)',
+      }}
+    >
+      {children}
+    </div>
+  </Html>
+);
 import { useRideStore } from '@/store/rideStore';
 
 const CameraController = () => {
@@ -124,7 +154,13 @@ const CabinModel = () => {
   return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
-const CabinScene3D = () => (
+const CabinScene3D = ({
+  onStartRide,
+  onReplay,
+}: {
+  onStartRide: () => void;
+  onReplay: () => void;
+}) => (
   <>
     <ambientLight intensity={3.5} color="#fff8e7" />
     <directionalLight position={[5, 10, 5]} intensity={4.0} color="#ffecd2" castShadow />
@@ -136,6 +172,8 @@ const CabinScene3D = () => (
     <hemisphereLight args={['#87CEEB', '#F5E6CA', 2.0]} />
     <CabinModel />
     <CameraController />
+
+    {/* Windshield street view */}
     <Html
       position={[0, 1.4, 4]}
       rotation={[0, Math.PI, 0]}
@@ -145,8 +183,39 @@ const CabinScene3D = () => (
     >
       <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
     </Html>
+
+    {/* Dashboard HUD - center console */}
+    <Html
+      position={[0, 0.28, 1.2]}
+      rotation={[-0.35, Math.PI, 0]}
+      transform
+      scale={0.0035}
+      style={{ pointerEvents: 'auto' }}
+    >
+      <HUDOverlay />
+    </Html>
+
+    {/* Left dashboard screen */}
+    <DashboardScreen
+      position={[-0.55, 0.25, 1.1]}
+      rotation={[-0.3, Math.PI + 0.25, 0]}
+      width={360}
+      height={200}
+    >
+      <LeftScreen />
+    </DashboardScreen>
+
+    {/* Right dashboard screen */}
+    <DashboardScreen
+      position={[0.55, 0.25, 1.1]}
+      rotation={[-0.3, Math.PI - 0.25, 0]}
+      width={360}
+      height={200}
+    >
+      <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
+    </DashboardScreen>
+
     <Environment preset="sunset" background blur={0.5} />
-    {/* OrbitControls removed — camera controlled via D-pad */}
   </>
 );
 
@@ -163,50 +232,8 @@ const CabinScene = ({
       gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
       className="absolute inset-0"
     >
-      <CabinScene3D />
+      <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
-
-
-    {/* 2D Dashboard overlay */}
-    <div
-      className="absolute bottom-0 left-0 right-0 z-50 flex flex-col items-center gap-2 px-6 pb-2"
-      style={{ pointerEvents: 'none' }}
-    >
-      {/* HUD bar */}
-      <div style={{ pointerEvents: 'auto' }}>
-        <HUDOverlay />
-      </div>
-
-      {/* Screens row */}
-      <div className="flex justify-center gap-4">
-        <div
-          className="rounded-xl overflow-hidden"
-          style={{
-            pointerEvents: 'auto',
-            width: 360,
-            height: 200,
-            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
-            border: '1px solid hsl(220 15% 20% / 0.4)',
-            background: 'hsl(220 18% 8%)',
-          }}
-        >
-          <LeftScreen />
-        </div>
-        <div
-          className="rounded-xl overflow-hidden"
-          style={{
-            pointerEvents: 'auto',
-            width: 360,
-            height: 200,
-            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
-            border: '1px solid hsl(220 15% 20% / 0.4)',
-            background: 'hsl(220 18% 8%)',
-          }}
-        >
-          <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
-        </div>
-      </div>
-    </div>
   </div>
 );
 
