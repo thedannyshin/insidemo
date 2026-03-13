@@ -8,8 +8,14 @@ import { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewPanorama from './StreetViewPanorama';
 import { useRideStore } from '@/store/rideStore';
+import CameraDebugSliders, { useCameraBase } from './CameraDebugSliders';
 
 const CameraController = () => {
+  const baseX = useCameraBase((s) => s.baseX);
+  const baseY = useCameraBase((s) => s.baseY);
+  const baseZ = useCameraBase((s) => s.baseZ);
+  const lookPitch = useCameraBase((s) => s.lookPitch);
+  const lookYaw = useCameraBase((s) => s.lookYaw);
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
@@ -61,15 +67,16 @@ const CameraController = () => {
         joltZ = Math.sin(elapsed * 20) * 0.03 * (1 - elapsed * 2);
       }
     }
-    const cx = -0.25 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5;
-    const cy = 0.35 + offset.y + Math.sin(t * 0.8) * bobIntensity;
-    const cz = 0.15 + offset.z + joltZ;
+    const cx = baseX + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5;
+    const cy = baseY + offset.y + Math.sin(t * 0.8) * bobIntensity;
+    const cz = baseZ + offset.z + joltZ;
     camera.position.set(cx, cy, cz);
 
     const lookDist = 3;
-    const tx = cx + Math.sin(rotation.h + Math.PI) * lookDist;
-    const ty = cy + rotation.v * lookDist;
-    const tz = cz + Math.cos(rotation.h + Math.PI) * lookDist;
+    const baseYaw = lookYaw + rotation.h;
+    const tx = cx + Math.sin(baseYaw) * lookDist;
+    const ty = cy + (lookPitch + rotation.v) * lookDist;
+    const tz = cz + Math.cos(baseYaw) * lookDist;
     camera.lookAt(tx, ty, tz);
     (camera as THREE.PerspectiveCamera).fov = fov;
     (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
@@ -172,6 +179,7 @@ const CabinScene = ({
   onReplay: () => void;
 }) => (
   <div className="w-full h-screen relative" style={{ background: '#000' }}>
+    <CameraDebugSliders />
     {/* Street View panorama as full background */}
     <StreetViewPanorama />
 
