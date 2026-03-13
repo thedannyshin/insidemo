@@ -103,61 +103,59 @@ const StreetViewPanorama = () => {
       }
       routeDataRef.current = data;
       const waypoints = data?.waypoints;
-        if (!waypoints?.length) return;
+      if (!waypoints?.length) return;
 
-        // Try loading cached metadata
-        try {
-          const metaUrl = `${SUPABASE_URL}/storage/v1/object/public/streetview-cache/metadata.json`;
-          const metaRes = await fetch(metaUrl);
-          if (metaRes.ok) {
-            const meta: WaypointMeta[] = await metaRes.json();
-            if (meta.length === waypoints.length) {
-              metadataRef.current = meta;
-              setCacheReady(true);
-              setCacheStatus('ready');
-              // Load initial image: offset 0 = forward facing
-              const initialUrl = buildCachedUrl(meta[0].lat, meta[0].lng, 0, 0);
-              setImageUrl(initialUrl);
-              return;
-            }
-          }
-        } catch {}
-
-        // Cache not ready — trigger caching
-        setCacheStatus('downloading');
-        try {
-          const res = await fetch(`${SUPABASE_URL}/functions/v1/cache-streetview`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: SUPABASE_ANON_KEY,
-              authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({
-              waypoints: waypoints.map((w: any) => ({ lat: w.lat, lng: w.lng })),
-            }),
-          });
-          if (res.ok) {
-            const result = await res.json();
-            console.log('Street View cache result:', result);
-            if (result.metadata) {
-              metadataRef.current = result.metadata;
-            }
+      // Try loading cached metadata
+      try {
+        const metaUrl = `${SUPABASE_URL}/storage/v1/object/public/streetview-cache/metadata.json`;
+        const metaRes = await fetch(metaUrl);
+        if (metaRes.ok) {
+          const meta: WaypointMeta[] = await metaRes.json();
+          if (meta.length === waypoints.length) {
+            metadataRef.current = meta;
             setCacheReady(true);
             setCacheStatus('ready');
-            const m = result.metadata?.[0] || { lat: waypoints[0].lat, lng: waypoints[0].lng };
-            setImageUrl(buildCachedUrl(m.lat, m.lng, 0, 0));
-          } else {
-            console.error('Cache failed, falling back to live');
-            setCacheStatus('fallback');
-            loadImageLive(waypoints[0].lat, waypoints[0].lng, 315, 0, 100);
+            const initialUrl = buildCachedUrl(meta[0].lat, meta[0].lng, 0, 0);
+            setImageUrl(initialUrl);
+            return;
           }
-        } catch (err) {
-          console.error('Cache error:', err);
+        }
+      } catch {}
+
+      // Cache not ready — trigger caching
+      setCacheStatus('downloading');
+      try {
+        const res2 = await fetch(`${SUPABASE_URL}/functions/v1/cache-streetview`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_ANON_KEY,
+            authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            waypoints: waypoints.map((w: any) => ({ lat: w.lat, lng: w.lng })),
+          }),
+        });
+        if (res2.ok) {
+          const result = await res2.json();
+          console.log('Street View cache result:', result);
+          if (result.metadata) {
+            metadataRef.current = result.metadata;
+          }
+          setCacheReady(true);
+          setCacheStatus('ready');
+          const m = result.metadata?.[0] || { lat: waypoints[0].lat, lng: waypoints[0].lng };
+          setImageUrl(buildCachedUrl(m.lat, m.lng, 0, 0));
+        } else {
+          console.error('Cache failed, falling back to live');
           setCacheStatus('fallback');
           loadImageLive(waypoints[0].lat, waypoints[0].lng, 315, 0, 100);
         }
-      });
+      } catch (err) {
+        console.error('Cache error:', err);
+        setCacheStatus('fallback');
+        loadImageLive(waypoints[0].lat, waypoints[0].lng, 315, 0, 100);
+      }
     };
     loadRoute();
   }, []);
