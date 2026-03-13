@@ -127,7 +127,7 @@ const CabinScene3D = ({
     {/* Floor to block outside view beneath cabin */}
     <mesh position={[0, -1, 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[4, 6]} />
-      <meshStandardMaterial color="#1a1a1a" roughness={1} />
+      <meshStandardMaterial color="#000000" roughness={1} />
     </mesh>
     <CameraController />
 
