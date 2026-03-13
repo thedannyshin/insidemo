@@ -147,10 +147,10 @@ const CabinScene3D = ({
 
     {/* Combined dashboard panel */}
     <Html
-      position={[-0.14, 0.17, -0.26]}
-      rotation={[-0.20, 0, 0]}
+      position={[hudX, hudY, hudZ]}
+      rotation={[hudRotX, 0, 0]}
       transform
-      scale={0.0385}
+      scale={hudScale}
       style={{ pointerEvents: 'auto' }}
     >
       <div style={{
@@ -176,7 +176,8 @@ const CabinScene3D = ({
       </div>
     </Html>
   </>
-);
+  );
+};
 
 const CabinScene = ({
   onStartRide,
