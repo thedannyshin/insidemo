@@ -66,12 +66,18 @@ const StreetViewPanorama = () => {
 
     const iHeading = lerpAngle(wpA.heading ?? 315, wpB.heading ?? 315, subT);
 
-    // Map camera rotation to 360 video: horizontal rotation affects heading, vertical affects pitch
-    const rotationH = rotation.h * (180 / Math.PI); // radians to degrees
-    const rotationV = rotation.v * (180 / Math.PI);
+    // Map cabin camera rotation (±0.45 rad) to a modest video rotation
+    // so the 360 video moves proportionally with the cabin view
+    const maxCabinH = Math.PI * 0.45; // from CameraControls clamp
+    const maxVideoH = 30; // degrees of video panning at full cabin rotation
+    const maxCabinV = 0.5;
+    const maxVideoV = 15;
+
+    const rotationH = (rotation.h / maxCabinH) * maxVideoH;
+    const rotationV = (rotation.v / maxCabinV) * maxVideoV;
 
     const finalHeading = ((iHeading + 220 + rotationH) % 360 + 360) % 360;
-    const finalPitch = rotationV * -15; // scale and invert for natural feel
+    const finalPitch = -rotationV;
 
     postToIframe({
       type: 'update_pov',
