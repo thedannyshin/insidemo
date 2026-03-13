@@ -32,7 +32,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const waypoints: { lat: number; lng: number }[] = body.waypoints;
+    const waypoints: { lat: number; lng: number; heading?: number }[] = body.waypoints;
 
     if (!waypoints?.length) {
       return new Response(
