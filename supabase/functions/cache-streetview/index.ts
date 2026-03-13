@@ -53,55 +53,44 @@ serve(async (req) => {
 
     for (const wp of waypoints) {
       const metaUrl = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${wp.lat},${wp.lng}&source=outdoor&key=${GOOGLE_MAPS_API_KEY}`;
+      
+      // Use heading from waypoint data (Directions API) if available
+      const wpIdx = waypoints.indexOf(wp);
+      const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
+      
+      let heading: number;
+      if (wp.heading !== undefined && wp.heading !== null) {
+        heading = wp.heading;
+      } else {
+        const dLng = nextWp.lng - wp.lng;
+        const dLat = nextWp.lat - wp.lat;
+        heading = (((Math.atan2(dLng, dLat) * 180) / Math.PI) % 360 + 360) % 360;
+      }
+
       try {
         const metaRes = await fetch(metaUrl);
         const meta = await metaRes.json();
         if (meta.status === "OK") {
-          // Calculate heading toward the next waypoint using the snapped pano position
-          const wpIdx = waypoints.indexOf(wp);
-          const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
-          const dLng = nextWp.lng - (meta.location?.lng || wp.lng);
-          const dLat = nextWp.lat - (meta.location?.lat || wp.lat);
-          const calcHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
-          const normalizedHeading = ((calcHeading % 360) + 360) % 360;
-
           metadataList.push({
             lat: wp.lat,
             lng: wp.lng,
             panoLat: meta.location?.lat || wp.lat,
             panoLng: meta.location?.lng || wp.lng,
-            heading: normalizedHeading,
+            heading,
             panoId: meta.pano_id || "",
           });
         } else {
-          // Fallback: calculate heading from waypoint vectors
-          const wpIdx = waypoints.indexOf(wp);
-          const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
-          const dLng = nextWp.lng - wp.lng;
-          const dLat = nextWp.lat - wp.lat;
-          const calcHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
           metadataList.push({
-            lat: wp.lat,
-            lng: wp.lng,
-            panoLat: wp.lat,
-            panoLng: wp.lng,
-            heading: ((calcHeading % 360) + 360) % 360,
-            panoId: "",
+            lat: wp.lat, lng: wp.lng,
+            panoLat: wp.lat, panoLng: wp.lng,
+            heading, panoId: "",
           });
         }
       } catch {
-        const wpIdx = waypoints.indexOf(wp);
-        const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
-        const dLng = nextWp.lng - wp.lng;
-        const dLat = nextWp.lat - wp.lat;
-        const calcHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
         metadataList.push({
-          lat: wp.lat,
-          lng: wp.lng,
-          panoLat: wp.lat,
-          panoLng: wp.lng,
-          heading: ((calcHeading % 360) + 360) % 360,
-          panoId: "",
+          lat: wp.lat, lng: wp.lng,
+          panoLat: wp.lat, panoLng: wp.lng,
+          heading, panoId: "",
         });
       }
       await new Promise((r) => setTimeout(r, 50));
