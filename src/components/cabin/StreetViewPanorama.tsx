@@ -119,15 +119,9 @@ function lerpAngle(a,b,t){
 
 function animatePov(){
   if(player&&ready&&player.getSphericalProperties){
-    var dy=Math.abs(((targetPov.yaw-currentPov.yaw+540)%360)-180);
-    var dp=Math.abs(targetPov.pitch-currentPov.pitch);
-    if(dy>0.05||dp>0.05){
-      currentPov.yaw=lerpAngle(currentPov.yaw,targetPov.yaw,0.5);
-      currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.5;
-      try{
-        player.setSphericalProperties({yaw:currentPov.yaw,pitch:currentPov.pitch,roll:0,fov:100});
-      }catch(e){}
-    }
+    try{
+      player.setSphericalProperties({yaw:targetPov.yaw,pitch:targetPov.pitch,roll:0,fov:100});
+    }catch(e){}
   }
   animFrame=requestAnimationFrame(animatePov);
 }
