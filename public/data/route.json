@@ -1,0 +1,22 @@
+{
+  "origin": "Market St & 4th St, San Francisco",
+  "destination": "Fisherman's Wharf, San Francisco",
+  "totalDistance": "4.2 miles",
+  "estimatedTime": 95,
+  "waypoints": [
+    { "lat": 37.7855, "lng": -122.4057, "speed": 0, "streetName": "Market Street", "turnInstruction": "Start", "eta": 95 },
+    { "lat": 37.7862, "lng": -122.4065, "speed": 15, "streetName": "Market Street", "eta": 92 },
+    { "lat": 37.7878, "lng": -122.4080, "speed": 25, "streetName": "Market Street", "eta": 85 },
+    { "lat": 37.7895, "lng": -122.4072, "speed": 30, "streetName": "Kearny Street", "turnInstruction": "Turn right onto Kearny St", "eta": 78 },
+    { "lat": 37.7920, "lng": -122.4055, "speed": 25, "streetName": "Kearny Street", "eta": 70 },
+    { "lat": 37.7945, "lng": -122.4040, "speed": 20, "streetName": "Columbus Avenue", "turnInstruction": "Merge onto Columbus Ave", "eta": 62 },
+    { "lat": 37.7970, "lng": -122.4075, "speed": 30, "streetName": "Columbus Avenue", "eta": 52 },
+    { "lat": 37.7990, "lng": -122.4095, "speed": 25, "streetName": "Columbus Avenue", "eta": 42 },
+    { "lat": 37.8010, "lng": -122.4110, "speed": 20, "streetName": "Columbus Avenue", "eta": 32 },
+    { "lat": 37.8035, "lng": -122.4125, "speed": 25, "streetName": "Bay Street", "turnInstruction": "Turn right onto Bay St", "eta": 22 },
+    { "lat": 37.8055, "lng": -122.4148, "speed": 20, "streetName": "Bay Street", "eta": 15 },
+    { "lat": 37.8075, "lng": -122.4170, "speed": 15, "streetName": "The Embarcadero", "turnInstruction": "Turn left onto The Embarcadero", "eta": 8 },
+    { "lat": 37.8080, "lng": -122.4177, "speed": 10, "streetName": "Jefferson Street", "turnInstruction": "Arriving at destination", "eta": 3 },
+    { "lat": 37.8083, "lng": -122.4180, "speed": 0, "streetName": "Jefferson Street", "turnInstruction": "Arrived", "eta": 0 }
+  ]
+}

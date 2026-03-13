@@ -1,0 +1,59 @@
+{
+  "incidents": [
+    {
+      "id": "inc-01",
+      "timestamp": 10,
+      "type": "obstacle",
+      "severity": "alert",
+      "hudCopy": "⚠ OBSTACLE — SLOWING",
+      "headline": "Hard Brake — Obstacle Detected",
+      "explanation": "A delivery vehicle has stopped in your lane ahead. Braking firmly to maintain safe distance. Will resume normal speed once clear.",
+      "voiceExplanation": "Slowing quickly — a delivery vehicle stopped ahead. Resuming speed now.",
+      "cameraJolt": true
+    },
+    {
+      "id": "inc-02",
+      "timestamp": 30,
+      "type": "lane_merge",
+      "severity": "caution",
+      "hudCopy": "↙ LANE MERGE",
+      "headline": "Lane Change — Cyclist Detected",
+      "explanation": "A cyclist is occupying the right lane ahead. Merging left to provide safe clearance. Speed maintained.",
+      "voiceExplanation": "Merging left — a cyclist is in the right lane. Adjusting path.",
+      "cameraJolt": false
+    },
+    {
+      "id": "inc-03",
+      "timestamp": 55,
+      "type": "traffic",
+      "severity": "info",
+      "hudCopy": "↓ TRAFFIC AHEAD",
+      "headline": "Traffic Slowdown",
+      "explanation": "Traffic congestion detected on the current route. Evaluating alternate paths to minimize delay. Current ETA adjusted by approximately 2 minutes.",
+      "voiceExplanation": "Traffic slowing ahead. Taking a slightly longer route to save time.",
+      "cameraJolt": false
+    },
+    {
+      "id": "inc-04",
+      "timestamp": 72,
+      "type": "school_zone",
+      "severity": "info",
+      "hudCopy": "🏫 SCHOOL ZONE",
+      "headline": "School Zone — Speed Reduced",
+      "explanation": "Entering a designated school zone. Speed automatically reduced to 15 mph for the next two blocks in compliance with local regulations.",
+      "voiceExplanation": "Entering a school zone. Reducing speed for the next two blocks.",
+      "cameraJolt": false
+    },
+    {
+      "id": "inc-05",
+      "timestamp": 85,
+      "type": "arrival",
+      "severity": "info",
+      "hudCopy": "📍 ARRIVING",
+      "headline": "Arriving at Destination",
+      "explanation": "You'll arrive at Fisherman's Wharf in approximately 90 seconds. The vehicle will pull over safely on your right side.",
+      "voiceExplanation": "You'll arrive in about 90 seconds. Preparing to pull over on your right.",
+      "cameraJolt": false
+    }
+  ]
+}
