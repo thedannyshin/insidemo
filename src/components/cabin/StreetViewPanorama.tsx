@@ -66,17 +66,17 @@ const StreetViewPanorama = () => {
 
     const iHeading = lerpAngle(wpA.heading ?? 315, wpB.heading ?? 315, subT);
 
-    // Map cabin camera rotation (±0.45 rad) to a modest video rotation
-    // so the 360 video moves proportionally with the cabin view
-    const maxCabinH = Math.PI * 0.45; // from CameraControls clamp
-    const maxVideoH = 30; // degrees of video panning at full cabin rotation
+    // Map cabin camera rotation to video rotation
+    // Cabin: +rotation.h = look left, but YouTube 360: +yaw = look right, so subtract
+    const maxCabinH = Math.PI * 0.45;
+    const maxVideoH = 40; // degrees of video panning at full cabin rotation
     const maxCabinV = 0.5;
-    const maxVideoV = 15;
+    const maxVideoV = 20;
 
     const rotationH = (rotation.h / maxCabinH) * maxVideoH;
     const rotationV = (rotation.v / maxCabinV) * maxVideoV;
 
-    const finalHeading = ((iHeading + 220 + rotationH) % 360 + 360) % 360;
+    const finalHeading = ((iHeading + 220 - rotationH) % 360 + 360) % 360;
     const finalPitch = rotationV;
 
     postToIframe({
@@ -119,15 +119,9 @@ function lerpAngle(a,b,t){
 
 function animatePov(){
   if(player&&ready&&player.getSphericalProperties){
-    var dy=Math.abs(((targetPov.yaw-currentPov.yaw+540)%360)-180);
-    var dp=Math.abs(targetPov.pitch-currentPov.pitch);
-    if(dy>0.05||dp>0.05){
-      currentPov.yaw=lerpAngle(currentPov.yaw,targetPov.yaw,0.5);
-      currentPov.pitch=currentPov.pitch+(targetPov.pitch-currentPov.pitch)*0.5;
-      try{
-        player.setSphericalProperties({yaw:currentPov.yaw,pitch:currentPov.pitch,roll:0,fov:100});
-      }catch(e){}
-    }
+    try{
+      player.setSphericalProperties({yaw:targetPov.yaw,pitch:targetPov.pitch,roll:0,fov:100});
+    }catch(e){}
   }
   animFrame=requestAnimationFrame(animatePov);
 }
