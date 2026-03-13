@@ -47,33 +47,50 @@ const btn = (label: string, onDown: () => void) => (
   </button>
 );
 
+const rotStep = 0.2;
+
 const CameraDPad = () => {
   const move = useCameraOffset((s) => s.move);
+  const rotate = useCameraOffset((s) => s.rotate);
   const reset = useCameraOffset((s) => s.reset);
 
   return (
-    <div className="flex flex-col items-center gap-1" style={{ pointerEvents: 'auto' }}>
-      <div className="text-[8px] tracking-widest uppercase mb-0.5" style={{ color: 'hsl(195 80% 60%)' }}>
-        Camera
+    <div className="flex gap-4" style={{ pointerEvents: 'auto' }}>
+      {/* Position controls */}
+      <div className="flex flex-col items-center gap-1">
+        <div className="text-[8px] tracking-widest uppercase mb-0.5" style={{ color: 'hsl(195 80% 60%)' }}>
+          Move
+        </div>
+        <div className="flex gap-1">
+          {btn('↑', () => move(0, step, 0))}
+        </div>
+        <div className="flex gap-1">
+          {btn('←', () => move(-step, 0, 0))}
+          {btn('●', reset)}
+          {btn('→', () => move(step, 0, 0))}
+        </div>
+        <div className="flex gap-1">
+          {btn('↓', () => move(0, -step, 0))}
+        </div>
+        <div className="flex gap-1 mt-0.5">
+          {btn('▲', () => move(0, 0, step))}
+          {btn('▼', () => move(0, 0, -step))}
+        </div>
       </div>
-      {/* Up */}
-      <div className="flex gap-1">
-        {btn('↑', () => move(0, step, 0))}
-      </div>
-      {/* Left / Reset / Right */}
-      <div className="flex gap-1">
-        {btn('←', () => move(-step, 0, 0))}
-        {btn('●', reset)}
-        {btn('→', () => move(step, 0, 0))}
-      </div>
-      {/* Down */}
-      <div className="flex gap-1">
-        {btn('↓', () => move(0, -step, 0))}
-      </div>
-      {/* Forward / Back */}
-      <div className="flex gap-1 mt-0.5">
-        {btn('▲', () => move(0, 0, step))}
-        {btn('▼', () => move(0, 0, -step))}
+
+      {/* Rotation controls */}
+      <div className="flex flex-col items-center gap-1">
+        <div className="text-[8px] tracking-widest uppercase mb-0.5" style={{ color: 'hsl(280 70% 65%)' }}>
+          Look
+        </div>
+        <div className="flex gap-1">
+          {btn('⬆', () => rotate(0, rotStep))}
+        </div>
+        <div className="flex gap-1">
+          {btn('⬅', () => rotate(rotStep, 0))}
+          {btn('⬇', () => rotate(0, -rotStep))}
+          {btn('➡', () => rotate(-rotStep, 0))}
+        </div>
       </div>
     </div>
   );
