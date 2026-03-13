@@ -84,24 +84,24 @@ const CabinSceneContent = ({
 
       {/* Left screen — entertainment */}
       <Html
-        position={[-0.55, 0.95, 1.4]}
-        rotation={[0, Math.PI - 0.15, 0]}
+        position={[-0.5, 0.75, 0.8]}
+        rotation={[-0.2, Math.PI - 0.25, 0]}
         transform
-        occlude
-        scale={0.004}
+        scale={0.003}
         style={{ pointerEvents: 'auto' }}
+        zIndexRange={[100, 0]}
       >
         <LeftScreen />
       </Html>
 
       {/* Right screen — navigation */}
       <Html
-        position={[0.55, 0.95, 1.4]}
-        rotation={[0, Math.PI + 0.15, 0]}
+        position={[0.5, 0.75, 0.8]}
+        rotation={[-0.2, Math.PI + 0.25, 0]}
         transform
-        occlude
-        scale={0.004}
+        scale={0.003}
         style={{ pointerEvents: 'auto' }}
+        zIndexRange={[100, 0]}
       >
         <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
       </Html>
