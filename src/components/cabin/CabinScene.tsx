@@ -125,7 +125,7 @@ const CabinScene3D = ({
     <hemisphereLight args={['#87CEEB', '#F5E6CA', 1.0]} />
     <CabinModel />
     {/* Floor to block outside view beneath cabin */}
-    <mesh position={[0, -0.01, 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
+    <mesh position={[0, -0.15, 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[4, 6]} />
       <meshStandardMaterial color="#1a1a1a" roughness={1} />
     </mesh>
