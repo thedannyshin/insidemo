@@ -127,7 +127,7 @@ export function useRideEngine() {
       const route = routeDataRef.current;
       if (!route) return;
 
-      const totalTime = route.estimatedTime;
+      const totalTime = route.estimatedTime * 60; // convert minutes to seconds
       const waypoints = route.waypoints;
 
       const tick = () => {
