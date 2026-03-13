@@ -1,126 +1,111 @@
-import { useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useGLTF, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useRideStore } from '@/store/rideStore';
 import HUDOverlay from './HUDOverlay';
-import { APIProvider, Map, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 
-const MapOverlay = () => {
-  const map = useMap();
-  const maps = useMapsLibrary('maps');
-  const routeProgress = useRideStore((s) => s.routeProgress);
+const CarModel = () => {
+  const { scene } = useGLTF('/models/cabin.glb');
+  const groupRef = useRef<THREE.Group>(null);
+  const phase = useRideStore((s) => s.phase);
 
   useEffect(() => {
-    if (!map || !maps) return;
+    const cloned = scene.clone();
+    const box = new THREE.Box3().setFromObject(cloned);
+    const center = box.getCenter(new THREE.Vector3());
+    cloned.position.x += cloned.position.x - center.x;
+    cloned.position.y += cloned.position.y - box.min.y;
+    cloned.position.z += cloned.position.z - center.z;
 
-    let scene: THREE.Scene;
-    let camera: THREE.PerspectiveCamera;
-    let renderer: THREE.WebGLRenderer;
-    let carModel: THREE.Object3D;
-
-    const overlay = new maps.WebGLOverlayView();
-
-    overlay.onAdd = () => {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera();
-      
-      const loader = new GLTFLoader();
-      loader.load('/models/cabin.glb', (gltf) => {
-        carModel = gltf.scene;
-        scene.add(carModel);
-      });
-
-      scene.add(new THREE.AmbientLight(0xffffff, 3.0));
-      const dirLight = new THREE.DirectionalLight(0xffecd2, 4.0);
-      dirLight.position.set(5, 10, 5);
-      scene.add(dirLight);
-    };
-
-    overlay.onDraw = ({ transformer }) => {
-      const webGLRenderer = transformer.getWebGLRenderer();
-      if (!renderer) {
-        renderer = webGLRenderer;
+    cloned.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
       }
-      
-      const t = routeProgress;
-      const start = { lat: 37.78576, lng: -122.40587 };
-      const end = { lat: 37.8086, lng: -122.41251 };
-      
-      const currentPos = {
-        lat: start.lat + (end.lat - start.lat) * t,
-        lng: start.lng + (end.lng - start.lng) * t,
-      };
-      const nextT = Math.min(t + 0.001, 1);
-      const nextPos = {
-        lat: start.lat + (end.lat - start.lat) * nextT,
-        lng: start.lng + (end.lng - start.lng) * nextT,
-      };
+    });
 
-      const angleRad = Math.atan2(nextPos.lng - currentPos.lng, nextPos.lat - currentPos.lat);
-      const matrix = transformer.fromLatLngAltitude({
-        lat: currentPos.lat,
-        lng: currentPos.lng,
-        altitude: 1,
-      });
+    if (groupRef.current) {
+      groupRef.current.clear();
+      groupRef.current.add(cloned);
+    }
+  }, [scene]);
 
-      if (carModel) {
-        carModel.position.set(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
-        carModel.rotation.set(Math.PI / 2, 0, -angleRad);
-        carModel.scale.set(0.1, 0.1, 0.1);
-      }
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    const t = clock.getElapsedTime();
+    if (phase === 'riding') {
+      groupRef.current.rotation.z = Math.sin(t * 1.2) * 0.008;
+      groupRef.current.position.y = Math.sin(t * 0.8) * 0.01;
+    }
+  });
 
-      renderer.render(scene, camera);
-      overlay.requestRedraw();
-    };
-    
-    overlay.setMap(map);
-
-    return () => overlay.setMap(null);
-  }, [map, maps, routeProgress]);
-
-  return null;
+  return <group ref={groupRef} />;
 };
 
 const BirdEyeView = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
 
-  const mapParams = useMemo(() => {
+  const mapCenter = useMemo(() => {
+    // Route: Market St to Fisherman's Wharf, SF
     const start = { lat: 37.78576, lng: -122.40587 };
     const end = { lat: 37.8086, lng: -122.41251 };
     const t = routeProgress;
-    
-    const lat = start.lat + (end.lat - start.lat) * t;
-    const lng = start.lng + (end.lng - start.lng) * t;
-
-    const nextT = Math.min(t + 0.001, 1);
-    const nextLat = start.lat + (end.lat - start.lat) * nextT;
-    const nextLng = start.lng + (end.lng - start.lng) * nextT;
-
-    const angleRad = Math.atan2(nextLng - lng, nextLat - lat);
-    const angleDeg = angleRad * (180 / Math.PI);
-
     return {
-      center: { lat, lng },
-      heading: angleDeg,
+      lat: start.lat + (end.lat - start.lat) * t,
+      lng: start.lng + (end.lng - start.lng) * t,
     };
-  }, [routeProgress]);
+  }, [Math.round(routeProgress * 20) / 20]); // Update every 5% progress
 
   return (
     <div className="w-full h-full relative">
-      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}>
-        <Map
-          center={mapParams.center}
-          zoom={18}
-          tilt={60}
-          heading={mapParams.heading}
-          mapId="DEMO_MAP_ID"
-          style={{ width: '100%', height: '100%' }}
-          disableDefaultUI={true}
-        >
-          <MapOverlay />
-        </Map>
-      </APIProvider>
+      {/* Google Maps satellite view as background */}
+      <iframe
+        src={`https://www.google.com/maps/embed/v1/view?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&center=${mapCenter.lat},${mapCenter.lng}&zoom=18`}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          zIndex: 0,
+        }}
+        loading="lazy"
+        allowFullScreen
+      />
 
+      {/* 3D car overlay on top of map */}
+      <div className="absolute inset-0" style={{ zIndex: 1 }}>
+        <Canvas
+          camera={{ position: [-1.0, 5.63, 3], fov: 50, near: 0.1, far: 500 }}
+          gl={{
+            antialias: true,
+            toneMapping: THREE.ACESFilmicToneMapping,
+            toneMappingExposure: 2.0,
+            alpha: true,
+          }}
+          style={{ background: 'transparent' }}
+        >
+          <ambientLight intensity={3.0} color="#fff8e7" />
+          <directionalLight position={[5, 10, 5]} intensity={4.0} color="#ffecd2" castShadow />
+          <directionalLight position={[-3, 6, -4]} intensity={1.5} color="#87CEEB" />
+          <hemisphereLight args={['#87CEEB', '#E8D8B4', 2.0]} />
+
+          <CarModel />
+
+          <OrbitControls
+            makeDefault
+            enablePan
+            maxPolarAngle={Math.PI / 2.5}
+            minPolarAngle={0}
+            maxDistance={10}
+            minDistance={3}
+            target={[-1.0, 0.63, 0]}
+          />
+        </Canvas>
+      </div>
+
+      {/* Overlay HUD */}
       <div
         className="absolute bottom-4 left-0 right-0 z-50 flex justify-center"
         style={{ pointerEvents: 'none' }}
