@@ -37,7 +37,7 @@ const CameraBob = () => {
 // Cabin model
 const CabinModel = () => {
   const { scene } = useGLTF('/models/cabin.glb');
-  return <primitive object={scene} scale={1} position={[0, 0, 0]} />;
+  return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
 // The full cabin scene content
@@ -66,8 +66,8 @@ const CabinSceneContent = ({
 
       {/* Street View — behind windshield */}
       <Html
-        position={[0, 1.4, -4]}
-        rotation={[0, 0, 0]}
+        position={[0, 1.4, 4]}
+        rotation={[0, Math.PI, 0]}
         transform
         scale={0.008}
         style={{ pointerEvents: 'none' }}
@@ -84,11 +84,11 @@ const CabinSceneContent = ({
 
       {/* Left screen — entertainment */}
       <Html
-        position={[-0.85, 1.1, -1.8]}
-        rotation={[0, 0.15, 0]}
+        position={[-0.55, 0.95, 1.4]}
+        rotation={[0, Math.PI - 0.15, 0]}
         transform
         occlude
-        scale={0.005}
+        scale={0.004}
         style={{ pointerEvents: 'auto' }}
       >
         <LeftScreen />
@@ -96,11 +96,11 @@ const CabinSceneContent = ({
 
       {/* Right screen — navigation */}
       <Html
-        position={[0.85, 1.1, -1.8]}
-        rotation={[0, -0.15, 0]}
+        position={[0.55, 0.95, 1.4]}
+        rotation={[0, Math.PI + 0.15, 0]}
         transform
         occlude
-        scale={0.005}
+        scale={0.004}
         style={{ pointerEvents: 'auto' }}
       >
         <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
@@ -120,7 +120,7 @@ const CabinSceneContent = ({
         minPolarAngle={Math.PI * 0.35}
         maxDistance={5}
         minDistance={1}
-        target={[0, 1.2, -2]}
+        target={[0, 1.0, 2]}
       />
     </>
   );
@@ -137,7 +137,7 @@ const CabinScene = ({
     <div className="w-full h-screen" style={{ background: 'hsl(220, 20%, 4%)' }}>
       <Canvas
         camera={{
-          position: [0, 1.3, 0.5],
+          position: [0, 0.85, -0.3],
           fov: 65,
           near: 0.1,
           far: 1000,
