@@ -28,8 +28,8 @@ serve(async (req) => {
 <style>
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#000}
-#pano{width:100%;height:100%;transition:opacity 0.4s ease}
-#pano.fading{opacity:0.6}
+#pano{width:100%;height:100%;transition:opacity 0.5s ease-in-out}
+#pano.fading{opacity:0.7}
 </style>
 </head>
 <body>
