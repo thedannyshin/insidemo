@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
@@ -115,15 +115,9 @@ const CabinModel = () => {
 const CabinScene3D = ({
   onStartRide,
   onReplay,
-  dashPos,
-  dashRot,
-  dashScale,
 }: {
   onStartRide: () => void;
   onReplay: () => void;
-  dashPos: [number, number, number];
-  dashRot: [number, number, number];
-  dashScale: number;
 }) => (
   <>
     <ambientLight intensity={3.5} color="#fff8e7" />
@@ -150,10 +144,10 @@ const CabinScene3D = ({
 
     {/* Combined dashboard panel */}
     <Html
-      position={dashPos}
-      rotation={dashRot}
+      position={[-0.14, 0.17, -0.26]}
+      rotation={[-0.20, 0, 0]}
       transform
-      scale={dashScale}
+      scale={0.0385}
       style={{ pointerEvents: 'auto' }}
     >
       <div style={{
@@ -183,117 +177,23 @@ const CabinScene3D = ({
   </>
 );
 
-/* Dev controls for positioning the dashboard */
-const DevControls = ({
-  pos, setPos, rot, setRot, scale, setScale,
-}: {
-  pos: [number, number, number]; setPos: (v: [number, number, number]) => void;
-  rot: [number, number, number]; setRot: (v: [number, number, number]) => void;
-  scale: number; setScale: (v: number) => void;
-}) => {
-  const labels = ['X', 'Y', 'Z'];
-  return (
-    <div
-      className="absolute top-16 left-4 z-[100] rounded-xl p-3 flex flex-col gap-2 text-[10px] font-mono"
-      style={{
-        background: 'hsl(220 18% 8% / 0.9)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid hsl(220 15% 20% / 0.4)',
-        color: 'rgba(200,220,240,0.8)',
-        width: 220,
-        pointerEvents: 'auto',
-      }}
-    >
-      <div className="font-bold text-xs" style={{ color: 'hsl(195 100% 50%)' }}>Dashboard Placement</div>
-      
-      <div className="font-bold mt-1">Position</div>
-      {labels.map((l, i) => (
-        <label key={`p${l}`} className="flex items-center gap-2">
-          <span className="w-3">{l}</span>
-          <input type="range" min={-3} max={3} step={0.01}
-            value={pos[i]}
-            onChange={e => { const n = [...pos] as [number, number, number]; n[i] = +e.target.value; setPos(n); }}
-            className="flex-1 h-1 accent-cyan-400"
-          />
-          <span className="w-10 text-right">{pos[i].toFixed(2)}</span>
-        </label>
-      ))}
-
-      <div className="font-bold mt-1">Rotation</div>
-      {labels.map((l, i) => (
-        <label key={`r${l}`} className="flex items-center gap-2">
-          <span className="w-3">{l}</span>
-          <input type="range" min={-3.14} max={3.14} step={0.01}
-            value={rot[i]}
-            onChange={e => { const n = [...rot] as [number, number, number]; n[i] = +e.target.value; setRot(n); }}
-            className="flex-1 h-1 accent-cyan-400"
-          />
-          <span className="w-10 text-right">{rot[i].toFixed(2)}</span>
-        </label>
-      ))}
-
-      <div className="font-bold mt-1">Scale</div>
-      <label className="flex items-center gap-2">
-        <span className="w-3">S</span>
-        <input type="range" min={0.001} max={0.05} step={0.0005}
-          value={scale}
-          onChange={e => setScale(+e.target.value)}
-          className="flex-1 h-1 accent-cyan-400"
-        />
-        <span className="w-10 text-right">{scale.toFixed(4)}</span>
-      </label>
-
-      <button
-        className="mt-2 px-2 py-1 rounded text-[9px] font-bold"
-        style={{ background: 'hsl(195 100% 50% / 0.2)', border: '1px solid hsl(195 100% 50% / 0.3)', color: 'hsl(195 100% 50%)' }}
-        onClick={() => {
-          const code = `position={[${pos.map(v => v.toFixed(2)).join(', ')}]} rotation={[${rot.map(v => v.toFixed(2)).join(', ')}]} scale={${scale.toFixed(4)}}`;
-          navigator.clipboard.writeText(code);
-          console.log('📋 Dashboard values:', code);
-        }}
-      >
-        📋 Copy Values
-      </button>
-    </div>
-  );
-};
-
 const CabinScene = ({
   onStartRide,
   onReplay,
 }: {
   onStartRide: () => void;
   onReplay: () => void;
-}) => {
-  const [dashPos, setDashPos] = useState<[number, number, number]>([0, 0.2, -0.4]);
-  const [dashRot, setDashRot] = useState<[number, number, number]>([-0.3, 0, 0]);
-  const [dashScale, setDashScale] = useState(0.012);
-
-  return (
-    <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
-      <Canvas
-        camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
-        className="absolute inset-0"
-      >
-        <CabinScene3D
-          onStartRide={onStartRide}
-          onReplay={onReplay}
-          dashPos={dashPos}
-          dashRot={dashRot}
-          dashScale={dashScale}
-        />
-      </Canvas>
-
-      {/* Dev controls for manual placement */}
-      <DevControls
-        pos={dashPos} setPos={setDashPos}
-        rot={dashRot} setRot={setDashRot}
-        scale={dashScale} setScale={setDashScale}
-      />
-    </div>
-  );
-};
+}) => (
+  <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
+    <Canvas
+      camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
+      gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
+      className="absolute inset-0"
+    >
+      <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
+    </Canvas>
+  </div>
+);
 
 useGLTF.preload('/models/cabin.glb');
 export default CabinScene;
