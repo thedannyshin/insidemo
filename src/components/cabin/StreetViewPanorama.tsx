@@ -87,6 +87,7 @@ const StreetViewPanorama = () => {
       ref={iframeRef}
       src={panoUrl}
       onLoad={handleIframeLoad}
+      sandbox="allow-scripts allow-same-origin"
       style={{
         position: 'absolute',
         inset: 0,
