@@ -45,6 +45,10 @@ const CabinModel = () => {
   const { scene } = useGLTF('/models/cabin.glb');
 
   useEffect(() => {
+    console.log('[CabinModel] Traversing meshes:');
+    scene.traverse((c: any) => {
+      if (c.isMesh) console.log(`  mesh="${c.name}" mat="${c.material?.name}" opacity=${c.material?.opacity} transparent=${c.material?.transparent}`);
+    });
     scene.traverse((child: any) => {
       if (!child.isMesh) return;
       const mat = child.material;
