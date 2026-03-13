@@ -11,6 +11,7 @@ import { useRideStore } from '@/store/rideStore';
 
 const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
+  const rotation = useCameraOffset((s) => s.rotation);
   const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
@@ -25,11 +26,17 @@ const CameraController = () => {
         joltZ = Math.sin(elapsed * 20) * 0.03 * (1 - elapsed * 2);
       }
     }
-    camera.position.set(
-      0 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5,
-      1.0 + offset.y + Math.sin(t * 0.8) * bobIntensity,
-      -0.3 + offset.z + joltZ,
-    );
+    const cx = 0 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5;
+    const cy = 1.0 + offset.y + Math.sin(t * 0.8) * bobIntensity;
+    const cz = -0.3 + offset.z + joltZ;
+    camera.position.set(cx, cy, cz);
+
+    // Apply look rotation: compute a target point in front of camera
+    const lookDist = 3;
+    const tx = cx + Math.sin(rotation.h) * lookDist;
+    const ty = cy + rotation.v * lookDist;
+    const tz = cz + Math.cos(rotation.h) * lookDist;
+    camera.lookAt(tx, ty, tz);
   });
   return null;
 };
