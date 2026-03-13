@@ -24,9 +24,35 @@ export function useRideEngine() {
     fetch('/data/incidents.json')
       .then((r) => r.json())
       .then((data) => setIncidents(data.incidents));
-    fetch('/data/route.json')
+
+    // Fetch dense route from Directions API
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+    fetch(`${SUPABASE_URL}/functions/v1/get-route`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SUPABASE_ANON_KEY,
+        authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({
+        origin: 'Market St & 4th St, San Francisco',
+        destination: "Fisherman's Wharf, San Francisco",
+        intervalMeters: 30,
+      }),
+    })
       .then((r) => r.json())
-      .then((data) => { routeDataRef.current = data; });
+      .then((data) => {
+        console.log(`Route loaded: ${data.sampledPointCount} waypoints (from ${data.rawPointCount} raw points)`);
+        routeDataRef.current = data;
+      })
+      .catch((err) => {
+        console.error('Failed to load route from API, falling back to static:', err);
+        fetch('/data/route.json')
+          .then((r) => r.json())
+          .then((data) => { routeDataRef.current = data; });
+      });
   }, [setIncidents]);
 
   const speakExplanation = useCallback((text: string) => {
