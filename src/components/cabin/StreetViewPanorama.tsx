@@ -69,7 +69,7 @@ const StreetViewPanorama = () => {
     // Map cabin camera rotation to video rotation
     // Cabin: +rotation.h = look left, but YouTube 360: +yaw = look right, so subtract
     const maxCabinH = Math.PI * 0.45;
-    const maxVideoH = 40; // degrees of video panning at full cabin rotation
+    const maxVideoH = 60; // degrees of video panning at full cabin rotation
     const maxCabinV = 0.5;
     const maxVideoV = 20;
 
