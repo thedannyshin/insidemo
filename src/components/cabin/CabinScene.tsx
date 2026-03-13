@@ -13,17 +13,21 @@ const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
   const isDragging = useRef(false);
   const lastPointer = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    const canvas = gl.domElement;
+    // Listen on window so drag works even when pointer leaves canvas
     const onPointerDown = (e: PointerEvent) => {
+      // Don't start drag if clicking on UI overlays (buttons, screens, etc.)
+      const target = e.target as HTMLElement;
+      if (target.tagName !== 'CANVAS') return;
       isDragging.current = true;
       lastPointer.current = { x: e.clientX, y: e.clientY };
+      e.preventDefault();
     };
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging.current) return;
@@ -34,15 +38,15 @@ const CameraController = () => {
     };
     const onPointerUp = () => { isDragging.current = false; };
 
-    canvas.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     return () => {
-      canvas.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };
-  }, [gl, rotate]);
+  }, [rotate]);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
