@@ -68,16 +68,7 @@ const CabinScene3D = () => (
       <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
     </Html>
     <Environment preset="sunset" background blur={0.5} />
-    <OrbitControls
-      makeDefault
-      enablePan={false}
-      enableZoom={false}
-      maxPolarAngle={Math.PI * 0.6}
-      minPolarAngle={Math.PI * 0.35}
-      maxAzimuthAngle={Math.PI * 0.3}
-      minAzimuthAngle={-Math.PI * 0.3}
-      target={[0, 1.0, 2.5]}
-    />
+    {/* OrbitControls removed — camera controlled via D-pad */}
   </>
 );
 
