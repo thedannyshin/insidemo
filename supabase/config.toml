@@ -1,7 +1,1 @@
-project_id = "jhogayiygatkarpctiwy"
-
-[functions.streetview-pano]
-verify_jwt = false
-
-[functions.cache-streetview]
-verify_jwt = false
+project_id = "eosuuwiilvuvpcnplykk"
