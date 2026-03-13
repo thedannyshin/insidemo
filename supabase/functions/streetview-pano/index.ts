@@ -94,7 +94,7 @@ function initPano(){
       targetPov.heading=e.data.heading||0;
       targetPov.pitch=e.data.pitch||0;
       clearTimeout(fadeTimer);
-      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},150);
+      fadeTimer=setTimeout(function(){panoEl.classList.remove("fading")},300);
     }
   });
 }
