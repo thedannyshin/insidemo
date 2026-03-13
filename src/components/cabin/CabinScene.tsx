@@ -62,9 +62,9 @@ const CabinScene3D = () => (
       enableZoom={false}
       maxPolarAngle={Math.PI * 0.6}
       minPolarAngle={Math.PI * 0.35}
-      maxAzimuthAngle={Math.PI * 0.25}
-      minAzimuthAngle={-Math.PI * 0.25}
-      target={[0, 1.2, 3]}
+      maxAzimuthAngle={Math.PI * 0.3}
+      minAzimuthAngle={-Math.PI * 0.3}
+      target={[0, 1.1, 2]}
     />
   </>
 );
