@@ -70,7 +70,7 @@ const StreetViewPanorama = () => {
     const headingOffsetDeg = (rotation.h * 180) / Math.PI;
     const pitchOffsetDeg = (rotation.v * 180) / Math.PI;
     const finalHeading = ((iHeading + 220 - headingOffsetDeg) % 360 + 360) % 360;
-    const finalPitch = pitchOffsetDeg * 0.5 + 15; // +15° down to lower the horizon
+    const finalPitch = pitchOffsetDeg * 0.5;
 
     postToIframe({
       type: 'update_pov',
