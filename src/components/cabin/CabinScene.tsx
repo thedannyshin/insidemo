@@ -50,7 +50,7 @@ const CabinScene3D = () => (
     <pointLight position={[1.5, 1.5, -1]} intensity={1.0} color="#98D8C8" />
     <hemisphereLight args={['#87CEEB', '#F5E6CA', 2.0]} />
     <CabinModel />
-    <CameraBob />
+    <CameraController />
     <Html
       position={[0, 1.4, 4]}
       rotation={[0, Math.PI, 0]}
