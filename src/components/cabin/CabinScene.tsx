@@ -55,7 +55,7 @@ const CabinScene3D = () => (
     >
       <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
     </Html>
-    <Environment preset="sunset" background />
+    <Environment preset="sunset" background blur={0.5} />
     <OrbitControls
       makeDefault
       enablePan={false}
