@@ -13,6 +13,8 @@ const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
+  const zoom = useCameraOffset((s) => s.zoom);
+  const fov = useCameraOffset((s) => s.fov);
   const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
