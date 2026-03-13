@@ -51,10 +51,12 @@ const CabinSceneContent = ({
   return (
     <>
       {/* Lighting */}
-      <ambientLight intensity={0.3} color="#8ecae6" />
-      <pointLight position={[0, 2, 0]} intensity={0.5} color="#c8d6e5" />
-      <pointLight position={[-1, 1.5, -1]} intensity={0.2} color="#00b4d8" />
-      <pointLight position={[1, 1.5, -1]} intensity={0.2} color="#7209b7" />
+      <ambientLight intensity={1.2} color="#e8f0ff" />
+      <pointLight position={[0, 2.5, 0]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[0, 1.5, -2]} intensity={0.8} color="#ffffff" />
+      <pointLight position={[-1.5, 1.5, -1]} intensity={0.6} color="#00b4d8" />
+      <pointLight position={[1.5, 1.5, -1]} intensity={0.6} color="#7209b7" />
+      <hemisphereLight args={['#b0d4f1', '#1a1a2e', 0.8]} />
 
       {/* Cabin model */}
       <CabinModel />
