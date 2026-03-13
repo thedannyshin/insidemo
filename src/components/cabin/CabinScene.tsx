@@ -105,15 +105,20 @@ const CabinScene = ({
       </Canvas>
 
       {/* 2D Dashboard overlay — positioned at bottom of viewport */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 px-8 pb-4 pointer-events-none z-10">
+      <div
+        className="absolute bottom-0 left-0 right-0 z-50 flex justify-center gap-6 px-8 pb-6"
+        style={{ pointerEvents: 'none' }}
+      >
         {/* Left screen */}
         <div
-          className="pointer-events-auto rounded-xl overflow-hidden shadow-2xl"
+          className="rounded-xl overflow-hidden"
           style={{
+            pointerEvents: 'auto',
             width: 340,
             height: 220,
-            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 0 60px -10px hsl(280 80% 60% / 0.1)',
+            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
             border: '1px solid hsl(220 15% 20% / 0.4)',
+            background: 'hsl(220 18% 8%)',
           }}
         >
           <LeftScreen />
@@ -121,12 +126,14 @@ const CabinScene = ({
 
         {/* Right screen */}
         <div
-          className="pointer-events-auto rounded-xl overflow-hidden shadow-2xl"
+          className="rounded-xl overflow-hidden"
           style={{
+            pointerEvents: 'auto',
             width: 340,
             height: 220,
-            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 0 60px -10px hsl(280 80% 60% / 0.1)',
+            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
             border: '1px solid hsl(220 15% 20% / 0.4)',
+            background: 'hsl(220 18% 8%)',
           }}
         >
           <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
