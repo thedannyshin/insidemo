@@ -37,7 +37,7 @@ const CameraBob = () => {
 // Cabin model
 const CabinModel = () => {
   const { scene } = useGLTF('/models/cabin.glb');
-  return <primitive object={scene} scale={1} position={[0, 0, 0]} />;
+  return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
 // The full cabin scene content
