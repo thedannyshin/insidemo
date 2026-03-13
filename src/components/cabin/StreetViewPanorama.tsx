@@ -69,7 +69,7 @@ const StreetViewPanorama = () => {
     // Apply user camera rotation as offset
     const headingOffsetDeg = (rotation.h * 180) / Math.PI;
     const pitchOffsetDeg = (rotation.v * 180) / Math.PI;
-    const finalHeading = ((iHeading + 180 - headingOffsetDeg) % 360 + 360) % 360;
+    const finalHeading = ((iHeading + 140 - headingOffsetDeg) % 360 + 360) % 360;
     const finalPitch = pitchOffsetDeg * 0.5;
 
     postToIframe({
