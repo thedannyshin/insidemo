@@ -34,23 +34,14 @@ const CameraBob = () => {
   return <group ref={groupRef} />;
 };
 
-// Cabin model
 const CabinModel = () => {
   const { scene } = useGLTF('/models/cabin.glb');
   return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
-// The full cabin scene content
-const CabinSceneContent = ({
-  onStartRide,
-  onReplay,
-}: {
-  onStartRide: () => void;
-  onReplay: () => void;
-}) => {
+const CabinScene3D = () => {
   return (
     <>
-      {/* Lighting */}
       <ambientLight intensity={1.2} color="#e8f0ff" />
       <pointLight position={[0, 2.5, 0]} intensity={1.5} color="#ffffff" />
       <pointLight position={[0, 1.5, -2]} intensity={0.8} color="#ffffff" />
@@ -58,13 +49,10 @@ const CabinSceneContent = ({
       <pointLight position={[1.5, 1.5, -1]} intensity={0.6} color="#7209b7" />
       <hemisphereLight args={['#b0d4f1', '#1a1a2e', 0.8]} />
 
-      {/* Cabin model */}
       <CabinModel />
-
-      {/* Camera bob */}
       <CameraBob />
 
-      {/* Street View — behind windshield */}
+      {/* Street View behind windshield */}
       <Html
         position={[0, 1.4, 4]}
         rotation={[0, Math.PI, 0]}
@@ -73,46 +61,13 @@ const CabinSceneContent = ({
         style={{ pointerEvents: 'none' }}
       >
         <StreetViewWindow
-          style={{
-            width: 640,
-            height: 400,
-            borderRadius: 0,
-            opacity: 0.9,
-          }}
+          style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }}
         />
       </Html>
 
-      {/* Left screen — entertainment */}
-      <Html
-        position={[-0.5, 0.75, 0.8]}
-        rotation={[-0.2, Math.PI - 0.25, 0]}
-        transform
-        scale={0.003}
-        style={{ pointerEvents: 'auto' }}
-        zIndexRange={[100, 0]}
-      >
-        <LeftScreen />
-      </Html>
-
-      {/* Right screen — navigation */}
-      <Html
-        position={[0.5, 0.75, 0.8]}
-        rotation={[-0.2, Math.PI + 0.25, 0]}
-        transform
-        scale={0.003}
-        style={{ pointerEvents: 'auto' }}
-        zIndexRange={[100, 0]}
-      >
-        <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
-      </Html>
-
-      {/* Windshield HUD — in front of street view */}
       <WindshieldHUD />
-
-      {/* Environment for reflections */}
       <Environment preset="night" />
 
-      {/* Debug camera controls */}
       <OrbitControls
         makeDefault
         enablePan={false}
@@ -134,7 +89,8 @@ const CabinScene = ({
   onReplay: () => void;
 }) => {
   return (
-    <div className="w-full h-screen" style={{ background: 'hsl(220, 20%, 4%)' }}>
+    <div className="w-full h-screen relative" style={{ background: 'hsl(220, 20%, 4%)' }}>
+      {/* 3D Canvas — car + street view + HUD */}
       <Canvas
         camera={{
           position: [0, 0.9, -0.2],
@@ -143,9 +99,39 @@ const CabinScene = ({
           far: 1000,
         }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
+        className="absolute inset-0"
       >
-        <CabinSceneContent onStartRide={onStartRide} onReplay={onReplay} />
+        <CabinScene3D />
       </Canvas>
+
+      {/* 2D Dashboard overlay — positioned at bottom of viewport */}
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 px-8 pb-4 pointer-events-none z-10">
+        {/* Left screen */}
+        <div
+          className="pointer-events-auto rounded-xl overflow-hidden shadow-2xl"
+          style={{
+            width: 340,
+            height: 220,
+            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 0 60px -10px hsl(280 80% 60% / 0.1)',
+            border: '1px solid hsl(220 15% 20% / 0.4)',
+          }}
+        >
+          <LeftScreen />
+        </div>
+
+        {/* Right screen */}
+        <div
+          className="pointer-events-auto rounded-xl overflow-hidden shadow-2xl"
+          style={{
+            width: 340,
+            height: 220,
+            boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 0 60px -10px hsl(280 80% 60% / 0.1)',
+            border: '1px solid hsl(220 15% 20% / 0.4)',
+          }}
+        >
+          <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
+        </div>
+      </div>
     </div>
   );
 };
