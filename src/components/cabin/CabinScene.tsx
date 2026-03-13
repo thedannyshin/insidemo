@@ -14,6 +14,8 @@ const CameraController = () => {
   const baseX = useCameraBase((s) => s.baseX);
   const baseY = useCameraBase((s) => s.baseY);
   const baseZ = useCameraBase((s) => s.baseZ);
+  const lookPitch = useCameraBase((s) => s.lookPitch);
+  const lookYaw = useCameraBase((s) => s.lookYaw);
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
