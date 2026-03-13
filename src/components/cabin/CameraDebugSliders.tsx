@@ -90,6 +90,13 @@ const CameraDebugSliders = () => {
     { label: 'Scale', key: 'hudScale', value: state.hudScale, min: 0.01, max: 0.08, step: 0.0005 },
   ];
 
+  const videoSliders = [
+    { label: 'H Range', key: 'videoMaxH', value: state.videoMaxH, min: 10, max: 180, step: 5 },
+    { label: 'V Range', key: 'videoMaxV', value: state.videoMaxV, min: 5, max: 90, step: 5 },
+    { label: 'Offset', key: 'videoHeadingOffset', value: state.videoHeadingOffset, min: 0, max: 360, step: 5 },
+    { label: 'Invert', key: 'videoInvertH', value: state.videoInvertH, min: -1, max: 1, step: 2 },
+  ];
+
   return (
     <div
       style={{
