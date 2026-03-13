@@ -187,7 +187,6 @@ const CabinScene = ({
   onReplay: () => void;
 }) => (
   <div className="w-full h-screen relative" style={{ background: '#000' }}>
-    <CameraDebugSliders />
     {/* Street View panorama as full background */}
     <StreetViewPanorama />
 

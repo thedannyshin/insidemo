@@ -142,7 +142,9 @@ function onYouTubeIframeAPIReady(){
       showinfo:0,
       iv_load_policy:3,
       playsinline:1,
-      loop:1
+      loop:1,
+      end:0,
+      annotation:0
     },
     events:{
       onReady:function(e){
