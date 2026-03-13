@@ -122,7 +122,14 @@ const CabinScene3D = ({
 }: {
   onStartRide: () => void;
   onReplay: () => void;
-}) => (
+}) => {
+  const hudX = useCameraBase((s) => s.hudX);
+  const hudY = useCameraBase((s) => s.hudY);
+  const hudZ = useCameraBase((s) => s.hudZ);
+  const hudRotX = useCameraBase((s) => s.hudRotX);
+  const hudScale = useCameraBase((s) => s.hudScale);
+
+  return (
   <>
     <ambientLight intensity={2.5} color="#fff8e7" />
     <directionalLight position={[5, 10, 5]} intensity={2.0} color="#ffecd2" castShadow />
@@ -140,10 +147,10 @@ const CabinScene3D = ({
 
     {/* Combined dashboard panel */}
     <Html
-      position={[-0.14, 0.17, -0.26]}
-      rotation={[-0.20, 0, 0]}
+      position={[hudX, hudY, hudZ]}
+      rotation={[hudRotX, 0, 0]}
       transform
-      scale={0.0385}
+      scale={hudScale}
       style={{ pointerEvents: 'auto' }}
     >
       <div style={{
