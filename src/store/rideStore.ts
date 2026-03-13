@@ -66,6 +66,7 @@ interface RideState {
 
   // Actions
   setPhase: (phase: RidePhase) => void;
+  setViewMode: (mode: ViewMode) => void;
   setDestination: (destination: string) => void;
   setCabinMode: (mode: CabinMode) => void;
   setSpeed: (speed: number) => void;
