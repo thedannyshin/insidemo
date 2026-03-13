@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import LeftScreen from './LeftScreen';
 import RightScreen from './RightScreen';
 import WindshieldHUD from './WindshieldHUD';
+import StreetViewWindow from './StreetViewWindow';
 import { useRideStore } from '@/store/rideStore';
 
 // Idle camera bob
@@ -17,12 +18,10 @@ const CameraBob = () => {
     if (!groupRef.current) return;
     const t = clock.getElapsedTime();
 
-    // Subtle idle bob
     const bobIntensity = phase === 'riding' ? 0.008 : 0.004;
     groupRef.current.position.y = Math.sin(t * 0.8) * bobIntensity;
     groupRef.current.position.x = Math.sin(t * 0.5) * bobIntensity * 0.5;
 
-    // Camera jolt on alert incidents
     if (activeIncident?.cameraJolt && activeIncident.active) {
       const elapsed = (Date.now() - activeIncident.startTime) / 1000;
       if (elapsed < 0.5) {
@@ -63,6 +62,24 @@ const CabinSceneContent = ({
       {/* Camera bob */}
       <CameraBob />
 
+      {/* Street View — behind windshield */}
+      <Html
+        position={[0, 1.4, -4]}
+        rotation={[0, 0, 0]}
+        transform
+        scale={0.008}
+        style={{ pointerEvents: 'none' }}
+      >
+        <StreetViewWindow
+          style={{
+            width: 640,
+            height: 400,
+            borderRadius: 0,
+            opacity: 0.9,
+          }}
+        />
+      </Html>
+
       {/* Left screen — entertainment */}
       <Html
         position={[-0.85, 1.1, -1.8]}
@@ -87,7 +104,7 @@ const CabinSceneContent = ({
         <RightScreen onStartRide={onStartRide} onReplay={onReplay} />
       </Html>
 
-      {/* Windshield HUD */}
+      {/* Windshield HUD — in front of street view */}
       <WindshieldHUD />
 
       {/* Environment for reflections */}
@@ -131,7 +148,6 @@ const CabinScene = ({
   );
 };
 
-// Preload the model
 useGLTF.preload('/models/cabin.glb');
 
 export default CabinScene;
