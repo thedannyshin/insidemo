@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, Html, OrbitControls, Environment } from '@react-three/drei';
+import { useGLTF, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import LeftScreen from './LeftScreen';
 import RightScreen from './RightScreen';
@@ -43,6 +43,42 @@ const CameraController = () => {
 
 const CabinModel = () => {
   const { scene } = useGLTF('/models/cabin.glb');
+
+  useEffect(() => {
+    console.log('[CabinModel] Traversing meshes:');
+    scene.traverse((c: any) => {
+      if (c.isMesh) console.log(`  mesh="${c.name}" mat="${c.material?.name}" opacity=${c.material?.opacity} transparent=${c.material?.transparent}`);
+    });
+    scene.traverse((child: any) => {
+      if (!child.isMesh) return;
+      const mat = child.material;
+      if (!mat) return;
+      const name = (mat.name || '').toLowerCase();
+      const meshName = (child.name || '').toLowerCase();
+      // Detect glass/window materials by name or high transparency
+      const isGlass =
+        name.includes('glass') ||
+        name.includes('window') ||
+        name.includes('windshield') ||
+        name.includes('transparent') ||
+        meshName.includes('glass') ||
+        meshName.includes('window') ||
+        meshName.includes('windshield');
+
+      if (isGlass || (mat.opacity !== undefined && mat.opacity < 0.9 && mat.opacity > 0)) {
+        mat.transparent = true;
+        mat.opacity = 0.15;
+        mat.depthWrite = false;
+        mat.side = THREE.DoubleSide;
+        mat.color = new THREE.Color('#aaddff');
+        mat.roughness = 0.05;
+        mat.metalness = 0.1;
+        mat.envMapIntensity = 2.0;
+        mat.needsUpdate = true;
+      }
+    });
+  }, [scene]);
+
   return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
