@@ -8,6 +8,7 @@ import { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewPanorama from './StreetViewPanorama';
 import { useRideStore } from '@/store/rideStore';
+import CameraDebugSliders, { useCameraBase } from './CameraDebugSliders';
 
 const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
