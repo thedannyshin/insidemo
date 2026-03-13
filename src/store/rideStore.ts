@@ -42,6 +42,7 @@ export interface ActiveIncident extends Incident {
 interface RideState {
   // Core ride state
   phase: RidePhase;
+  viewMode: ViewMode;
   passengerName: string;
   destination: string;
   cabinMode: CabinMode;
