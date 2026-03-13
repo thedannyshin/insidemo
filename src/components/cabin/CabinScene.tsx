@@ -27,8 +27,8 @@ const CameraController = () => {
       }
     }
     const cx = 0 + offset.x + Math.sin(t * 0.5) * bobIntensity * 0.5;
-    const cy = 1.0 + offset.y + Math.sin(t * 0.8) * bobIntensity;
-    const cz = -0.3 + offset.z + joltZ;
+    const cy = 0.55 + offset.y + Math.sin(t * 0.8) * bobIntensity;
+    const cz = 0.3 + offset.z + joltZ;
     camera.position.set(cx, cy, cz);
 
     // Apply look rotation: compute a target point in front of camera
