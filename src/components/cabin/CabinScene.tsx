@@ -59,11 +59,12 @@ const CabinScene3D = () => (
     <OrbitControls
       makeDefault
       enablePan={false}
-      maxPolarAngle={Math.PI * 0.65}
+      enableZoom={false}
+      maxPolarAngle={Math.PI * 0.6}
       minPolarAngle={Math.PI * 0.35}
-      maxDistance={5}
-      minDistance={1}
-      target={[0, 1.0, 2]}
+      maxAzimuthAngle={Math.PI * 0.25}
+      minAzimuthAngle={-Math.PI * 0.25}
+      target={[0, 1.2, 3]}
     />
   </>
 );
