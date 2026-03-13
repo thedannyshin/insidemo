@@ -10,13 +10,19 @@ serve(async (req) => {
 
   const GOOGLE_MAPS_API_KEY = Deno.env.get("GOOGLE_MAPS_API_KEY");
   if (!GOOGLE_MAPS_API_KEY) {
-    return new Response("GOOGLE_MAPS_API_KEY not configured", { status: 500 });
+    return new Response("GOOGLE_MAPS_API_KEY not configured", { status: 500, headers: corsHeaders });
   }
 
   const url = new URL(req.url);
-  const lat = url.searchParams.get("lat") || "37.7855";
-  const lng = url.searchParams.get("lng") || "-122.4057";
-  const heading = url.searchParams.get("heading") || "0";
+  const lat = Number(url.searchParams.get("lat") || "37.7855");
+  const lng = Number(url.searchParams.get("lng") || "-122.4057");
+  const heading = Number(url.searchParams.get("heading") || "0");
+  const pitch = Number(url.searchParams.get("pitch") || "0");
+
+  const safeLat = Number.isFinite(lat) ? lat : 37.7855;
+  const safeLng = Number.isFinite(lng) ? lng : -122.4057;
+  const safeHeading = Number.isFinite(heading) ? heading : 0;
+  const safePitch = Number.isFinite(pitch) ? pitch : 0;
 
   const html = `<!DOCTYPE html>
 <html><head>
@@ -32,10 +38,39 @@ serve(async (req) => {
 <div id="pano"></div>
 <script>
 let panorama;
+let streetViewService;
+let lastKnownLocation={lat:${safeLat},lng:${safeLng}};
+
+function normalizeHeading(h){
+  return ((h % 360) + 360) % 360;
+}
+
+function applyNearestPanorama(lat,lng,heading,pitch){
+  if(!streetViewService||!panorama) return;
+  const target={lat,lng};
+  streetViewService.getPanorama(
+    { location: target, radius: 120, source: google.maps.StreetViewSource.OUTDOOR },
+    function(data,status){
+      if(status==='OK' && data && data.location && data.location.pano){
+        panorama.setPano(data.location.pano);
+        panorama.setPov({heading: normalizeHeading(heading), pitch: pitch || 0});
+        panorama.setVisible(true);
+        if(data.location.latLng){
+          lastKnownLocation={lat:data.location.latLng.lat(),lng:data.location.latLng.lng()};
+        }
+      }else{
+        panorama.setPosition(lastKnownLocation);
+        panorama.setPov({heading: normalizeHeading(heading), pitch: pitch || 0});
+      }
+    }
+  );
+}
+
 function initMap(){
+  streetViewService=new google.maps.StreetViewService();
   panorama=new google.maps.StreetViewPanorama(document.getElementById('pano'),{
-    position:{lat:${lat},lng:${lng}},
-    pov:{heading:${heading},pitch:0},
+    position:{lat:${safeLat},lng:${safeLng}},
+    pov:{heading:${safeHeading},pitch:${safePitch}},
     zoom:1,
     disableDefaultUI:true,
     showRoadLabels:false,
@@ -47,16 +82,19 @@ function initMap(){
     zoomControl:false,
     fullscreenControl:false,
     addressControl:false,
-    enableCloseButton:false
+    enableCloseButton:false,
+    visible:true,
   });
+
+  applyNearestPanorama(${safeLat}, ${safeLng}, ${safeHeading}, ${safePitch});
 }
+
 window.addEventListener('message',function(e){
   if(!panorama||!e.data) return;
   try{
     const d=typeof e.data==='string'?JSON.parse(e.data):e.data;
-    if(d.lat&&d.lng){
-      panorama.setPosition({lat:d.lat,lng:d.lng});
-      if(d.heading!==undefined) panorama.setPov({heading:d.heading,pitch:d.pitch||0});
+    if(d.lat!==undefined&&d.lng!==undefined){
+      applyNearestPanorama(Number(d.lat), Number(d.lng), Number(d.heading||0), Number(d.pitch||0));
     }
   }catch{}
 });
