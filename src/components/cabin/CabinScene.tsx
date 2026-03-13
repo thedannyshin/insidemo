@@ -59,11 +59,12 @@ const CabinScene3D = () => (
     <OrbitControls
       makeDefault
       enablePan={false}
-      maxPolarAngle={Math.PI * 0.65}
+      enableZoom={false}
+      maxPolarAngle={Math.PI * 0.6}
       minPolarAngle={Math.PI * 0.35}
-      maxDistance={5}
-      minDistance={1}
-      target={[0, 1.0, 2]}
+      maxAzimuthAngle={Math.PI * 0.3}
+      minAzimuthAngle={-Math.PI * 0.3}
+      target={[0, 1.0, 2.5]}
     />
   </>
 );
@@ -77,7 +78,7 @@ const CabinScene = ({
 }) => (
   <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
     <Canvas
-      camera={{ position: [0, 0.9, -0.2], fov: 75, near: 0.05, far: 1000 }}
+      camera={{ position: [0, 1.0, -0.3], fov: 72, near: 0.01, far: 1000 }}
       gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
       className="absolute inset-0"
     >
