@@ -11,6 +11,9 @@ import { useRideStore } from '@/store/rideStore';
 import CameraDebugSliders, { useCameraBase } from './CameraDebugSliders';
 
 const CameraController = () => {
+  const baseX = useCameraBase((s) => s.baseX);
+  const baseY = useCameraBase((s) => s.baseY);
+  const baseZ = useCameraBase((s) => s.baseZ);
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
