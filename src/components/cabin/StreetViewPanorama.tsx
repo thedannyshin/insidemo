@@ -66,11 +66,9 @@ const StreetViewPanorama = () => {
 
     const iHeading = lerpAngle(wpA.heading ?? 315, wpB.heading ?? 315, subT);
 
-    // Apply user camera rotation as offset
-    const headingOffsetDeg = (rotation.h * 180) / Math.PI;
-    const pitchOffsetDeg = (rotation.v * 180) / Math.PI;
-    const finalHeading = ((iHeading + 220 - headingOffsetDeg) % 360 + 360) % 360;
-    const finalPitch = pitchOffsetDeg * 0.5;
+    // Video always faces forward — camera rotation only affects the 3D cabin view
+    const finalHeading = ((iHeading + 220) % 360 + 360) % 360;
+    const finalPitch = 0;
 
     postToIframe({
       type: 'update_pov',
@@ -83,7 +81,7 @@ const StreetViewPanorama = () => {
       type: 'seek',
       progress: routeProgress,
     });
-  }, [routeProgress, phase, rotation.h, rotation.v, postToIframe]);
+  }, [routeProgress, phase, postToIframe]);
 
   // Build the srcdoc HTML for the YouTube 360 player
   const srcdoc = `<!DOCTYPE html>
