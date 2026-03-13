@@ -31,7 +31,7 @@ const CameraController = () => {
       const dx = e.clientX - lastPointer.current.x;
       const dy = e.clientY - lastPointer.current.y;
       lastPointer.current = { x: e.clientX, y: e.clientY };
-      rotate(dx * 0.004, dy * 0.004);
+      rotate(-dx * 0.004, dy * 0.004);
     };
     const onPointerUp = () => { isDragging.current = false; };
     const onWheel = (e: WheelEvent) => {
