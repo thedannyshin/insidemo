@@ -8,9 +8,9 @@ interface CameraBaseState {
 }
 
 export const useCameraBase = create<CameraBaseState>((set) => ({
-  baseX: -0.25,
-  baseY: 0.45,
-  baseZ: 0.15,
+  baseX: -0.3,
+  baseY: 0.39,
+  baseZ: 0.16,
   setBase: (axis, value) => set({ [axis]: value }),
 }));
 
