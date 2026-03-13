@@ -13,6 +13,8 @@ const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
   const rotate = useCameraOffset((s) => s.rotate);
+  const zoom = useCameraOffset((s) => s.zoom);
+  const fov = useCameraOffset((s) => s.fov);
   const { camera } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
@@ -38,15 +40,22 @@ const CameraController = () => {
     };
     const onPointerUp = () => { isDragging.current = false; };
 
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      zoom(e.deltaY * 0.05);
+    };
+
     window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('wheel', onWheel);
     };
-  }, [rotate]);
+  }, [rotate, zoom]);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -68,6 +77,8 @@ const CameraController = () => {
     const ty = cy + rotation.v * lookDist;
     const tz = cz + Math.cos(rotation.h + Math.PI) * lookDist;
     camera.lookAt(tx, ty, tz);
+    (camera as THREE.PerspectiveCamera).fov = fov;
+    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
   });
   return null;
 };
