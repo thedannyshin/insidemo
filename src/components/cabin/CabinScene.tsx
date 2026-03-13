@@ -106,7 +106,7 @@ const CabinScene = ({
 
       {/* 2D Dashboard overlay — positioned at bottom of viewport */}
       <div
-        className="absolute bottom-0 left-0 right-0 z-50 flex justify-center gap-6 px-8 pb-6"
+        className="absolute bottom-0 left-0 right-0 z-50 flex justify-center gap-4 px-6 pb-3"
         style={{ pointerEvents: 'none' }}
       >
         {/* Left screen */}
