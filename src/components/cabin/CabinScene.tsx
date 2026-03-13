@@ -40,15 +40,22 @@ const CameraController = () => {
     };
     const onPointerUp = () => { isDragging.current = false; };
 
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      zoom(e.deltaY * 0.05);
+    };
+
     window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('wheel', onWheel);
     };
-  }, [rotate]);
+  }, [rotate, zoom]);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
