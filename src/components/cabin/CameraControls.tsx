@@ -2,9 +2,11 @@ import { create } from 'zustand';
 
 interface CameraOffsetState {
   offset: { x: number; y: number; z: number };
-  rotation: { h: number; v: number }; // horizontal & vertical look angles
+  rotation: { h: number; v: number };
+  fov: number;
   move: (dx: number, dy: number, dz: number) => void;
   rotate: (dh: number, dv: number) => void;
+  zoom: (delta: number) => void;
   reset: () => void;
 }
 
