@@ -114,8 +114,8 @@ const CabinScene = ({
           className="rounded-xl overflow-hidden"
           style={{
             pointerEvents: 'auto',
-            width: 340,
-            height: 220,
+            width: 360,
+            height: 240,
             boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
             border: '1px solid hsl(220 15% 20% / 0.4)',
             background: 'hsl(220 18% 8%)',
