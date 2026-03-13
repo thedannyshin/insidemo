@@ -90,6 +90,11 @@ const CabinScene = ({
       <CabinScene3D />
     </Canvas>
 
+    {/* Camera D-Pad */}
+    <div className="absolute top-4 left-4 z-50">
+      <CameraDPad />
+    </div>
+
     {/* 2D Dashboard overlay */}
     <div
       className="absolute bottom-0 left-0 right-0 z-50 flex flex-col items-center gap-2 px-6 pb-2"
