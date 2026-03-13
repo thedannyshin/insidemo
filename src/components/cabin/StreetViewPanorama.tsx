@@ -116,7 +116,7 @@ const StreetViewPanorama = () => {
               authorization: `Bearer ${SUPABASE_ANON_KEY}`,
             },
             body: JSON.stringify({
-              waypoints: waypoints.map((w: any) => ({ lat: w.lat, lng: w.lng })),
+              waypoints: waypoints.map((w: any) => ({ lat: w.lat, lng: w.lng, heading: w.heading })),
             }),
           });
           if (res.ok) {
@@ -186,16 +186,19 @@ const StreetViewPanorama = () => {
     const headingOffsetDeg = (rotation.h * 180) / Math.PI;
     const pitchOffsetDeg = (rotation.v * 180) / Math.PI;
 
+    // Use heading from waypoint data if available (from Directions API)
+    const waypointHeading = wp.heading ?? null;
+
     if (cacheReady) {
       // Use cached images — headingOffset 0 = forward (real heading baked in)
-      // User rotation maps to heading offset from forward
       const offsetFromForward = (((-headingOffsetDeg) % 360) + 360) % 360;
       const cachedUrl = buildCachedUrl(wp.lat, wp.lng, offsetFromForward, pitchOffsetDeg * 0.5);
       fetchedRotRef.current = { h: rotation.h, v: rotation.v };
       setImageUrl(cachedUrl);
     } else if (cacheStatus === 'fallback') {
       const meta = metadataRef.current[wpIndex];
-      const baseHeading = meta?.heading || 315;
+      // Prefer waypoint heading from Directions API, then metadata heading
+      const baseHeading = waypointHeading ?? meta?.heading ?? 315;
       loadImageLive(wp.lat, wp.lng, baseHeading - headingOffsetDeg, pitchOffsetDeg * 0.5, fov);
     }
   }, [routeProgress, phase, rotation.h, rotation.v, fov, cacheReady, cacheStatus]);
