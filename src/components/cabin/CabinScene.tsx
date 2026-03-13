@@ -23,11 +23,8 @@ const CameraController = () => {
 
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName !== 'CANVAS') return;
       isDragging.current = true;
       lastPointer.current = { x: e.clientX, y: e.clientY };
-      e.preventDefault();
     };
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging.current) return;
