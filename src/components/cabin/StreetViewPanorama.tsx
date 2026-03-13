@@ -80,11 +80,29 @@ const StreetViewPanorama = () => {
 
   // Load route data, check/trigger cache
   useEffect(() => {
-    fetch('/data/route.json')
-      .then((r) => r.json())
-      .then(async (data) => {
-        routeDataRef.current = data;
-        const waypoints = data?.waypoints;
+    const loadRoute = async () => {
+      let data: any;
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/get-route`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_ANON_KEY,
+            authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            origin: 'Market St & 4th St, San Francisco',
+            destination: "Fisherman's Wharf, San Francisco",
+            intervalMeters: 30,
+          }),
+        });
+        data = await res.json();
+      } catch {
+        const fallback = await fetch('/data/route.json');
+        data = await fallback.json();
+      }
+      routeDataRef.current = data;
+      const waypoints = data?.waypoints;
         if (!waypoints?.length) return;
 
         // Try loading cached metadata
