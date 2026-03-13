@@ -88,7 +88,7 @@ const StreetViewPanorama = () => {
     const finalPitch = pitchOffsetDeg * 0.5;
 
     // Only send position update when moved enough (~30m) to avoid constant pano-snapping
-    const MIN_DIST = 0.0003; // ~30m in degrees
+    const MIN_DIST = 0.00015; // ~15m in degrees for denser waypoints
     const lastPos = lastSentPos.current;
     const needsPositionUpdate =
       !lastPos ||
