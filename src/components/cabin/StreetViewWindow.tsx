@@ -1,65 +1,69 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
 const StreetViewWindow = ({ className, style }: { className?: string; style?: React.CSSProperties }) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
   const routeDataRef = useRef<any>(null);
-  const lastSentRef = useRef<string>('');
+  const [imageUrl, setImageUrl] = useState('');
 
-  // Load route data once
   useEffect(() => {
     fetch('/data/route.json')
       .then((r) => r.json())
-      .then((data) => { routeDataRef.current = data; });
+      .then((data) => {
+        routeDataRef.current = data;
+      });
   }, []);
 
-  // Compute initial coords
-  const initialUrl = useMemo(() => {
-    return `${SUPABASE_URL}/functions/v1/streetview?lat=37.7855&lng=-122.4057&heading=315&pitch=0`;
+  const buildUrl = useMemo(() => {
+    return (lat: number, lng: number, heading: number, pitch = 0) => {
+      const params = new URLSearchParams({
+        lat: String(lat),
+        lng: String(lng),
+        heading: String(Math.round(heading)),
+        pitch: String(Math.round(pitch)),
+        fov: '100',
+        w: '1920',
+        h: '1080',
+        t: String(Date.now()),
+      });
+      return `${SUPABASE_URL}/functions/v1/streetview?${params.toString()}`;
+    };
   }, []);
 
-  // Update Street View position as ride progresses
   useEffect(() => {
-    if (!routeDataRef.current || phase === 'pre-ride') return;
+    if (!routeDataRef.current) return;
+
     const waypoints = routeDataRef.current.waypoints;
     const wpIndex = Math.min(
       Math.floor(routeProgress * (waypoints.length - 1)),
       waypoints.length - 1
     );
+
     const wp = waypoints[wpIndex];
     const nextWp = waypoints[Math.min(wpIndex + 1, waypoints.length - 1)];
-
-    // Calculate heading from current to next waypoint
     const dLng = nextWp.lng - wp.lng;
     const dLat = nextWp.lat - wp.lat;
     const rawHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
     const heading = ((rawHeading % 360) + 360) % 360;
 
-    const key = `${wp.lat},${wp.lng}`;
-    if (key === lastSentRef.current) return;
-    lastSentRef.current = key;
-
-    iframeRef.current?.contentWindow?.postMessage(
-      JSON.stringify({ lat: wp.lat, lng: wp.lng, heading, pitch: 0 }),
-      '*'
-    );
-  }, [routeProgress, phase]);
+    setImageUrl(buildUrl(wp.lat, wp.lng, heading, phase === 'riding' ? 0 : -2));
+  }, [buildUrl, phase, routeProgress]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      src={initialUrl}
+    <img
+      src={imageUrl}
       className={className}
       style={{
         border: 'none',
+        objectFit: 'cover',
         ...style,
       }}
-      allow="accelerometer; gyroscope"
-      sandbox="allow-scripts allow-same-origin"
+      alt="Live street view"
+      loading="eager"
+      draggable={false}
     />
   );
 };
