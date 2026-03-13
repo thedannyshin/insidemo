@@ -26,7 +26,7 @@ const RightScreen = ({
   return (
     <div
       className="insidemo-screen w-full h-full relative"
-      style={{ width: 320, height: 200, padding: 16 }}
+      style={{ width: '100%', height: '100%', padding: 16 }}
     >
       {phase === 'pre-ride' && (
         <PreRideNav
