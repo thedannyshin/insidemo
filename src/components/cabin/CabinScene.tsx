@@ -43,6 +43,38 @@ const CameraController = () => {
 
 const CabinModel = () => {
   const { scene } = useGLTF('/models/cabin.glb');
+
+  useEffect(() => {
+    scene.traverse((child: any) => {
+      if (!child.isMesh) return;
+      const mat = child.material;
+      if (!mat) return;
+      const name = (mat.name || '').toLowerCase();
+      const meshName = (child.name || '').toLowerCase();
+      // Detect glass/window materials by name or high transparency
+      const isGlass =
+        name.includes('glass') ||
+        name.includes('window') ||
+        name.includes('windshield') ||
+        name.includes('transparent') ||
+        meshName.includes('glass') ||
+        meshName.includes('window') ||
+        meshName.includes('windshield');
+
+      if (isGlass || (mat.opacity !== undefined && mat.opacity < 0.9 && mat.opacity > 0)) {
+        mat.transparent = true;
+        mat.opacity = 0.15;
+        mat.depthWrite = false;
+        mat.side = THREE.DoubleSide;
+        mat.color = new THREE.Color('#aaddff');
+        mat.roughness = 0.05;
+        mat.metalness = 0.1;
+        mat.envMapIntensity = 2.0;
+        mat.needsUpdate = true;
+      }
+    });
+  }, [scene]);
+
   return <primitive object={scene} scale={1} position={[0, 0, 0]} rotation={[0, Math.PI, 0]} />;
 };
 
