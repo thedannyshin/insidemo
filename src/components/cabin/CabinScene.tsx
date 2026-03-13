@@ -12,9 +12,37 @@ import { useRideStore } from '@/store/rideStore';
 const CameraController = () => {
   const offset = useCameraOffset((s) => s.offset);
   const rotation = useCameraOffset((s) => s.rotation);
-  const { camera } = useThree();
+  const rotate = useCameraOffset((s) => s.rotate);
+  const { camera, gl } = useThree();
   const phase = useRideStore((s) => s.phase);
   const activeIncident = useRideStore((s) => s.activeIncident);
+  const isDragging = useRef(false);
+  const lastPointer = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const onPointerDown = (e: PointerEvent) => {
+      isDragging.current = true;
+      lastPointer.current = { x: e.clientX, y: e.clientY };
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.clientX - lastPointer.current.x;
+      const dy = e.clientY - lastPointer.current.y;
+      lastPointer.current = { x: e.clientX, y: e.clientY };
+      rotate(-dx * 0.004, dy * 0.004);
+    };
+    const onPointerUp = () => { isDragging.current = false; };
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    return () => {
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [gl, rotate]);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -31,7 +59,6 @@ const CameraController = () => {
     const cz = 0.3 + offset.z + joltZ;
     camera.position.set(cx, cy, cz);
 
-    // Apply look rotation: compute a target point in front of camera
     const lookDist = 3;
     const tx = cx + Math.sin(rotation.h + Math.PI) * lookDist;
     const ty = cy + rotation.v * lookDist;
