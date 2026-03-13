@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const HEADINGS = [0, 45, 90, 135, 180, 225, 270, 315];
+const HEADINGS_OFFSETS = [0, 45, 90, 135, 180, 225, 270, 315]; // offsets from base heading
 const PITCHES = [-15, 0, 15];
 const IMAGE_WIDTH = 1280;
 const IMAGE_HEIGHT = 720;
@@ -41,21 +41,99 @@ serve(async (req) => {
       );
     }
 
-    const results: { path: string; status: string }[] = [];
-    let cached = 0;
-    let downloaded = 0;
+    // Step 1: Fetch metadata for each waypoint to get real camera heading
+    const metadataList: {
+      lat: number;
+      lng: number;
+      panoLat: number;
+      panoLng: number;
+      heading: number;
+      panoId: string;
+    }[] = [];
 
     for (const wp of waypoints) {
-      for (const heading of HEADINGS) {
+      const metaUrl = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${wp.lat},${wp.lng}&source=outdoor&key=${GOOGLE_MAPS_API_KEY}`;
+      try {
+        const metaRes = await fetch(metaUrl);
+        const meta = await metaRes.json();
+        if (meta.status === "OK") {
+          // Calculate heading toward the next waypoint using the snapped pano position
+          const wpIdx = waypoints.indexOf(wp);
+          const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
+          const dLng = nextWp.lng - (meta.location?.lng || wp.lng);
+          const dLat = nextWp.lat - (meta.location?.lat || wp.lat);
+          const calcHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
+          const normalizedHeading = ((calcHeading % 360) + 360) % 360;
+
+          metadataList.push({
+            lat: wp.lat,
+            lng: wp.lng,
+            panoLat: meta.location?.lat || wp.lat,
+            panoLng: meta.location?.lng || wp.lng,
+            heading: normalizedHeading,
+            panoId: meta.pano_id || "",
+          });
+        } else {
+          // Fallback: calculate heading from waypoint vectors
+          const wpIdx = waypoints.indexOf(wp);
+          const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
+          const dLng = nextWp.lng - wp.lng;
+          const dLat = nextWp.lat - wp.lat;
+          const calcHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
+          metadataList.push({
+            lat: wp.lat,
+            lng: wp.lng,
+            panoLat: wp.lat,
+            panoLng: wp.lng,
+            heading: ((calcHeading % 360) + 360) % 360,
+            panoId: "",
+          });
+        }
+      } catch {
+        const wpIdx = waypoints.indexOf(wp);
+        const nextWp = waypoints[Math.min(wpIdx + 1, waypoints.length - 1)];
+        const dLng = nextWp.lng - wp.lng;
+        const dLat = nextWp.lat - wp.lat;
+        const calcHeading = (Math.atan2(dLng, dLat) * 180) / Math.PI;
+        metadataList.push({
+          lat: wp.lat,
+          lng: wp.lng,
+          panoLat: wp.lat,
+          panoLng: wp.lng,
+          heading: ((calcHeading % 360) + 360) % 360,
+          panoId: "",
+        });
+      }
+      await new Promise((r) => setTimeout(r, 50));
+    }
+
+    // Step 2: Save metadata as JSON
+    const metaJson = JSON.stringify(metadataList, null, 2);
+    await supabase.storage
+      .from("streetview-cache")
+      .upload("metadata.json", new TextEncoder().encode(metaJson), {
+        contentType: "application/json",
+        upsert: true,
+      });
+
+    // Step 3: Download images at offsets from real heading
+    let cached = 0;
+    let downloaded = 0;
+    const results: { path: string; status: string }[] = [];
+
+    for (const meta of metadataList) {
+      const folder = `${meta.lat.toFixed(4)}_${meta.lng.toFixed(4)}`;
+
+      for (const offset of HEADINGS_OFFSETS) {
+        const absHeading = ((meta.heading + offset) % 360 + 360) % 360;
+
         for (const pitch of PITCHES) {
-          const path = `${wp.lat.toFixed(4)}_${wp.lng.toFixed(4)}/${heading}_${pitch}.jpg`;
+          const path = `${folder}/${offset}_${pitch}.jpg`;
 
           // Check if already cached
           const { data: existing } = await supabase.storage
             .from("streetview-cache")
-            .list(`${wp.lat.toFixed(4)}_${wp.lng.toFixed(4)}`, {
-              search: `${heading}_${pitch}.jpg`,
-            });
+            .list(folder, { search: `${offset}_${pitch}.jpg` });
 
           if (existing && existing.length > 0) {
             cached++;
@@ -63,14 +141,17 @@ serve(async (req) => {
             continue;
           }
 
-          // Fetch from Google Street View Static API
+          // Fetch from Google using the actual pano position for better accuracy
           const svUrl = new URL("https://maps.googleapis.com/maps/api/streetview");
           svUrl.searchParams.set("size", `${IMAGE_WIDTH}x${IMAGE_HEIGHT}`);
-          svUrl.searchParams.set("location", `${wp.lat},${wp.lng}`);
-          svUrl.searchParams.set("heading", String(heading));
+          if (meta.panoId) {
+            svUrl.searchParams.set("pano", meta.panoId);
+          } else {
+            svUrl.searchParams.set("location", `${meta.panoLat},${meta.panoLng}`);
+          }
+          svUrl.searchParams.set("heading", String(Math.round(absHeading)));
           svUrl.searchParams.set("pitch", String(pitch));
           svUrl.searchParams.set("fov", String(FOV));
-          svUrl.searchParams.set("source", "outdoor");
           svUrl.searchParams.set("return_error_code", "true");
           svUrl.searchParams.set("key", GOOGLE_MAPS_API_KEY);
 
@@ -81,8 +162,6 @@ serve(async (req) => {
           }
 
           const imageBytes = new Uint8Array(await response.arrayBuffer());
-
-          // Upload to storage
           const { error: uploadError } = await supabase.storage
             .from("streetview-cache")
             .upload(path, imageBytes, {
@@ -97,7 +176,6 @@ serve(async (req) => {
             results.push({ path, status: "downloaded" });
           }
 
-          // Small delay to avoid rate limiting
           await new Promise((r) => setTimeout(r, 100));
         }
       }
@@ -109,11 +187,9 @@ serve(async (req) => {
         cached,
         downloaded,
         errors: results.filter((r) => r.status.includes("error")).length,
-        details: results,
+        metadata: metadataList,
       }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
