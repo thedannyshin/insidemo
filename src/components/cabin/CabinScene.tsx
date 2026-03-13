@@ -1,9 +1,10 @@
 import { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Html, OrbitControls, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import LeftScreen from './LeftScreen';
 import RightScreen from './RightScreen';
+import CameraDPad, { useCameraOffset } from './CameraControls';
 import HUDOverlay from './HUDOverlay';
 import StreetViewWindow from './StreetViewWindow';
 import { useRideStore } from '@/store/rideStore';
