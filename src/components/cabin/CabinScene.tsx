@@ -188,10 +188,12 @@ const CabinScene = ({
 }) => (
   <div className="w-full h-screen relative" style={{ background: '#000' }}>
     {/* Street View panorama as full background */}
-    {/* Street View panorama as full background */}
     <StreetViewPanorama />
 
-    {/* 3D cabin overlay with transparent background — pointer-events:none so drag goes to iframe */}
+    {/* Transparent overlay to capture pointer events for look-around (iframe steals them otherwise) */}
+    <div style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+
+    {/* 3D cabin overlay with transparent background */}
     <Canvas
       camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
       gl={{
@@ -200,7 +202,7 @@ const CabinScene = ({
         toneMappingExposure: 1.8,
         alpha: true,
       }}
-      style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'transparent', pointerEvents: 'none' }}
+      style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'transparent', pointerEvents: 'none' }}
     >
       <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
