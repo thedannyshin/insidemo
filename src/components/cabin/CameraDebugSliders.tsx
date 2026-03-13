@@ -17,13 +17,13 @@ interface CameraBaseState {
 export const useCameraBase = create<CameraBaseState>((set) => ({
   baseX: -0.36,
   baseY: 0.33,
-  baseZ: 0.40,
-  lookPitch: 0.00,
-  lookYaw: 3.18,
-  hudX: -0.135,
+  baseZ: 0.47,
+  lookPitch: 0.06,
+  lookYaw: 3.14,
+  hudX: -0.145,
   hudY: 0.09,
   hudZ: -0.26,
-  hudRotX: -0.02,
+  hudRotX: -0.04,
   hudScale: 0.052,
   setBase: (axis, value) => set({ [axis]: value }),
 }));
