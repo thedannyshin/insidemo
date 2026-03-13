@@ -148,6 +148,7 @@ export const useRideStore = create<RideState>((set) => ({
   resetRide: () =>
     set({
       phase: 'pre-ride',
+      viewMode: 'cabin',
       speed: 0,
       currentStreet: 'Market Street',
       nextTurn: '',
