@@ -1,1 +1,4 @@
 project_id = "htzywzqrqacdxdkqakhx"
+
+[functions.maps-proxy]
+verify_jwt = false
