@@ -67,17 +67,18 @@ const StreetViewPanorama = () => {
 
     const iHeading = lerpAngle(wpA.heading ?? 315, wpB.heading ?? 315, subT);
 
-    // Map cabin camera rotation to video rotation
-    // Cabin: +rotation.h = look left, but YouTube 360: +yaw = look right, so subtract
+    const videoMaxH = useCameraBase.getState().videoMaxH;
+    const videoMaxV = useCameraBase.getState().videoMaxV;
+    const videoHeadingOffset = useCameraBase.getState().videoHeadingOffset;
+    const videoInvertH = useCameraBase.getState().videoInvertH;
+
     const maxCabinH = Math.PI * 0.45;
-    const maxVideoH = 60; // degrees of video panning at full cabin rotation
     const maxCabinV = 0.5;
-    const maxVideoV = 20;
 
-    const rotationH = (rotation.h / maxCabinH) * maxVideoH;
-    const rotationV = (rotation.v / maxCabinV) * maxVideoV;
+    const rotationH = (rotation.h / maxCabinH) * videoMaxH * videoInvertH;
+    const rotationV = (rotation.v / maxCabinV) * videoMaxV;
 
-    const finalHeading = ((iHeading + 220 + rotationH) % 360 + 360) % 360;
+    const finalHeading = ((iHeading + videoHeadingOffset + rotationH) % 360 + 360) % 360;
     const finalPitch = rotationV;
 
     postToIframe({
