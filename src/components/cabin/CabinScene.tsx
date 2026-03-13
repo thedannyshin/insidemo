@@ -36,13 +36,14 @@ const CabinModel = () => {
 
 const CabinScene3D = () => (
   <>
-    <ambientLight intensity={2.0} color="#fff8e7" />
-    <directionalLight position={[5, 8, 3]} intensity={2.5} color="#ffecd2" castShadow />
-    <pointLight position={[0, 2.5, 0]} intensity={1.2} color="#ffffff" />
-    <pointLight position={[0, 1.5, 4]} intensity={1.5} color="#ffd89b" />
-    <pointLight position={[-1.5, 1.5, -1]} intensity={0.4} color="#87CEEB" />
-    <pointLight position={[1.5, 1.5, -1]} intensity={0.4} color="#98D8C8" />
-    <hemisphereLight args={['#87CEEB', '#F5E6CA', 1.2]} />
+    <ambientLight intensity={3.5} color="#fff8e7" />
+    <directionalLight position={[5, 10, 5]} intensity={4.0} color="#ffecd2" castShadow />
+    <directionalLight position={[-3, 6, 8]} intensity={2.0} color="#87CEEB" />
+    <pointLight position={[0, 2.5, 0]} intensity={2.0} color="#ffffff" />
+    <pointLight position={[0, 1.5, 4]} intensity={3.0} color="#ffd89b" />
+    <pointLight position={[-1.5, 1.5, -1]} intensity={1.0} color="#87CEEB" />
+    <pointLight position={[1.5, 1.5, -1]} intensity={1.0} color="#98D8C8" />
+    <hemisphereLight args={['#87CEEB', '#F5E6CA', 2.0]} />
     <CabinModel />
     <CameraBob />
     <Html
@@ -54,7 +55,7 @@ const CabinScene3D = () => (
     >
       <StreetViewWindow style={{ width: 640, height: 400, borderRadius: 0, opacity: 0.9 }} />
     </Html>
-    <Environment preset="sunset" />
+    <Environment preset="sunset" background blur={0.5} />
     <OrbitControls
       makeDefault
       enablePan={false}
@@ -74,10 +75,10 @@ const CabinScene = ({
   onStartRide: () => void;
   onReplay: () => void;
 }) => (
-  <div className="w-full h-screen relative" style={{ background: 'hsl(220, 20%, 4%)' }}>
+  <div className="w-full h-screen relative" style={{ background: 'linear-gradient(180deg, #87CEEB 0%, #B8D8E8 40%, #E8D8C0 100%)' }}>
     <Canvas
       camera={{ position: [0, 0.9, -0.2], fov: 75, near: 0.05, far: 1000 }}
-      gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
+      gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.8 }}
       className="absolute inset-0"
     >
       <CabinScene3D />
