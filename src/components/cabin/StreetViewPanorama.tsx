@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
+import { useCameraBase } from './CameraDebugSliders';
 import { densifyWaypoints } from '@/lib/densifyRoute';
 
 /** Shortest-path lerp for angles in degrees */
