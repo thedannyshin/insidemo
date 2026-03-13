@@ -110,6 +110,7 @@ export const useRideStore = create<RideState>((set) => ({
   music: initialMusic,
 
   setPhase: (phase) => set({ phase }),
+  setViewMode: (mode) => set({ viewMode: mode }),
   setDestination: (destination) => set({ destination }),
   setCabinMode: (mode) => set({ cabinMode: mode }),
   setSpeed: (speed) => set({ speed }),
