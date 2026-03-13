@@ -1,48 +1,80 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+const buildUrl = (lat: number, lng: number, heading: number, pitch: number, fov: number) => {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lng: String(lng),
+    heading: String(Math.round(((heading % 360) + 360) % 360)),
+    pitch: String(Math.round(Math.max(-90, Math.min(90, pitch)))),
+    fov: String(Math.round(Math.max(30, Math.min(120, fov)))),
+    w: '1920',
+    h: '1080',
+    t: String(Date.now()),
+  });
+  return `${SUPABASE_URL}/functions/v1/streetview?${params.toString()}`;
+};
 
 const StreetViewPanorama = () => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
   const rotation = useCameraOffset((s) => s.rotation);
+  const fov = useCameraOffset((s) => s.fov);
   const routeDataRef = useRef<any>(null);
   const baseHeadingRef = useRef(315);
-  const iframeReady = useRef(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const loadingRef = useRef(false);
+  const lastFetchRef = useRef(0);
 
   // Load route data
   useEffect(() => {
     fetch('/data/route.json')
       .then((r) => r.json())
-      .then((data) => { routeDataRef.current = data; });
+      .then((data) => {
+        routeDataRef.current = data;
+        const first = data?.waypoints?.[0];
+        if (first) loadImage(first.lat, first.lng, 315, 0, 100);
+      });
+    return () => {
+      if (imageUrl.startsWith('blob:')) URL.revokeObjectURL(imageUrl);
+    };
   }, []);
 
-  // Mark iframe as ready after load
-  const handleIframeLoad = () => {
-    iframeReady.current = true;
-  };
+  const loadImage = useCallback(async (lat: number, lng: number, heading: number, pitch: number, viewFov: number) => {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY || loadingRef.current) return;
+    const now = Date.now();
+    if (now - lastFetchRef.current < 300) return; // throttle
+    loadingRef.current = true;
+    lastFetchRef.current = now;
 
-  // Sync camera rotation to panorama POV
-  useEffect(() => {
-    const iframe = iframeRef.current;
-    if (!iframe?.contentWindow || !iframeReady.current) return;
-    const headingOffset = (rotation.h * 180) / Math.PI;
-    const pitchOffset = (rotation.v * 180) / Math.PI;
-    iframe.contentWindow.postMessage({
-      type: 'update_pov',
-      heading: baseHeadingRef.current - headingOffset,
-      pitch: pitchOffset * 0.5,
-    }, '*');
-  }, [rotation.h, rotation.v]);
+    try {
+      const url = buildUrl(lat, lng, heading, pitch, viewFov);
+      const res = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      setImageUrl((prev) => {
+        if (prev.startsWith('blob:')) URL.revokeObjectURL(prev);
+        return objectUrl;
+      });
+    } finally {
+      loadingRef.current = false;
+    }
+  }, []);
 
-  // Sync route progress to panorama position
+  // Sync with camera rotation and route progress
   useEffect(() => {
-    const iframe = iframeRef.current;
     const rd = routeDataRef.current;
-    if (!iframe?.contentWindow || !iframeReady.current || !rd?.waypoints?.length) return;
+    if (!rd?.waypoints?.length) return;
 
     const waypoints = rd.waypoints;
     const wpIndex = Math.min(
@@ -60,45 +92,39 @@ const StreetViewPanorama = () => {
     const headingOffset = (rotation.h * 180) / Math.PI;
     const pitchOffset = (rotation.v * 180) / Math.PI;
 
-    iframe.contentWindow.postMessage({
-      type: 'update_all',
-      lat: wp.lat,
-      lng: wp.lng,
-      heading: heading - headingOffset,
-      pitch: pitchOffset * 0.5,
-    }, '*');
-  }, [routeProgress, phase]);
-
-  // Listen for POV changes from the iframe (user dragging inside panorama)
-  useEffect(() => {
-    const onMessage = (e: MessageEvent) => {
-      if (e.data?.type === 'pov_changed') {
-        // Could sync back to camera rotation here if needed
-      }
-    };
-    window.addEventListener('message', onMessage);
-    return () => window.removeEventListener('message', onMessage);
-  }, []);
-
-  const panoUrl = `${SUPABASE_URL}/functions/v1/streetview-pano?lat=37.7855&lng=-122.4057&heading=315&pitch=0`;
+    loadImage(
+      wp.lat,
+      wp.lng,
+      heading - headingOffset,
+      pitchOffset * 0.5,
+      fov
+    );
+  }, [routeProgress, phase, rotation.h, rotation.v, fov, loadImage]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      src={panoUrl}
-      onLoad={handleIframeLoad}
-      sandbox="allow-scripts allow-same-origin"
+    <div
       style={{
         position: 'absolute',
         inset: 0,
-        width: '100%',
-        height: '100%',
-        border: 'none',
         zIndex: 0,
+        background: '#111',
+        overflow: 'hidden',
       }}
-      allow="accelerometer; gyroscope"
-      title="Street View Panorama"
-    />
+    >
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Street view"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'brightness(1.1) contrast(1.05) saturate(1.1)',
+          }}
+          draggable={false}
+        />
+      )}
+    </div>
   );
 };
 
