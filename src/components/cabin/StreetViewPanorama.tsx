@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
 import { useCameraBase } from './CameraDebugSliders';
