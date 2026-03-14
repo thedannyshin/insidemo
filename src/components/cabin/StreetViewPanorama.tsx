@@ -196,7 +196,7 @@ function onYouTubeIframeAPIReady(){
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
         // Enforce POV periodically to prevent YouTube auto-rotation
-        povEnforcer=setInterval(setPov,200);
+        povEnforcer=setInterval(setPov,1000);
         setPov();
       },
       onStateChange:function(e){
