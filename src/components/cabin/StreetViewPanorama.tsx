@@ -12,12 +12,11 @@ const lerpAngle = (a: number, b: number, t: number) => {
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-const YOUTUBE_VIDEO_ID = 'c9OcB9CzKpA';
-
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
   const setEta = useRideStore((s) => s.setEta);
+  const selectedVideoId = useRideStore((s) => s.selectedVideoId);
   const rotation = useCameraOffset((s) => s.rotation);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeDataRef = useRef<any>(null);
