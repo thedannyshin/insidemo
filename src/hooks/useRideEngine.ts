@@ -120,7 +120,7 @@ export function useRideEngine() {
       }
     };
     frameRef.current = requestAnimationFrame(rampUp);
-  }, [setPhase, setSpeed, setRideStartTime, setMusic, incidents, firedIncidentIds]);
+  }, [setPhase, setSpeed, setRideStartTime, setMusic, incidents, firedIncidentIds, startRoutePlayback]);
 
   const startRoutePlayback = useCallback(
     (startTime: number) => {
