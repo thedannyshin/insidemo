@@ -42,7 +42,7 @@ const StreetViewPanorama = () => {
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data === 'yt360_ready') {
-        playerReadyRef.current = true;
+        setPlayerReady(true);
         return;
       }
 
