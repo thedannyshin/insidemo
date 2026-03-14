@@ -38,16 +38,26 @@ const StreetViewPanorama = () => {
       });
   }, []);
 
-  // Listen for player ready message
+  // Listen for player ready message and video control commands
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data === 'yt360_ready') {
         playerReadyRef.current = true;
       }
     };
+    const controlHandler = (e: Event) => {
+      const cmd = (e as CustomEvent).detail;
+      if (cmd === 'play' || cmd === 'pause') {
+        postToIframe({ type: cmd });
+      }
+    };
     window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, []);
+    window.addEventListener('video_control', controlHandler);
+    return () => {
+      window.removeEventListener('message', handler);
+      window.removeEventListener('video_control', controlHandler);
+    };
+  }, [postToIframe]);
 
   // Sync heading/pitch and video timeline with route progress
   useEffect(() => {
