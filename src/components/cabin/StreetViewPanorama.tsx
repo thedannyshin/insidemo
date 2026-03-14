@@ -145,8 +145,7 @@ iframe{border:none}
 <script>
 var player, duration=0, ready=false;
 var currentPov={yaw:315,pitch:0};
-var targetPov={yaw:315,pitch:0};
-var animFrame, etaTimer;
+var etaTimer, povEnforcer;
 
 function lerpAngle(a,b,t){
   var d=((b-a+540)%360)-180;
@@ -159,13 +158,12 @@ function reportRemaining(){
   parent.postMessage({type:"yt360_time",remaining:Math.max(0,Math.round(duration-ct))},"*");
 }
 
-function animatePov(){
-  if(player&&ready&&player.getSphericalProperties){
+function setPov(){
+  if(player&&ready&&player.setSphericalProperties){
     try{
-      player.setSphericalProperties({yaw:targetPov.yaw,pitch:targetPov.pitch,roll:0,fov:100});
+      player.setSphericalProperties({yaw:currentPov.yaw,pitch:currentPov.pitch,roll:0,fov:100,enableOrientationSensor:false});
     }catch(e){}
   }
-  animFrame=requestAnimationFrame(animatePov);
 }
 
 function onYouTubeIframeAPIReady(){
@@ -190,19 +188,18 @@ function onYouTubeIframeAPIReady(){
       onReady:function(e){
         ready=true;
         duration=e.target.getDuration()||1;
-        // Show first frame: seek to 0 and pause
         e.target.mute();
         e.target.seekTo(0,true);
         e.target.playVideo();
-        // Pause after a brief moment to render first frame
         setTimeout(function(){ e.target.pauseVideo(); },300);
         parent.postMessage("yt360_ready","*");
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
-        animatePov();
+        // Enforce POV periodically to prevent YouTube auto-rotation
+        povEnforcer=setInterval(setPov,200);
+        setPov();
       },
       onStateChange:function(e){
-        // YT.PlayerState.ENDED === 0 — seek back to freeze on last frame
         if(e.data===0&&duration>0){
           player.seekTo(duration-0.5,true);
           player.pauseVideo();
@@ -217,8 +214,9 @@ window.addEventListener("message",function(e){
   try{d=JSON.parse(e.data)}catch(x){return}
   if(!d||!d.type)return;
   if(d.type==="update_pov"){
-    targetPov.yaw=d.heading||0;
-    targetPov.pitch=d.pitch||0;
+    currentPov.yaw=d.heading||0;
+    currentPov.pitch=d.pitch||0;
+    setPov();
   }
   if(d.type==="seek"&&ready&&duration>0){
     var t=d.progress*duration;
