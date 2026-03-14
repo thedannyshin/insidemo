@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import CameraDebugSliders from './CameraDebugSliders';
+
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -207,7 +207,6 @@ const CabinScene = ({
     >
       <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
-    <CameraDebugSliders />
   </div>
 );
 

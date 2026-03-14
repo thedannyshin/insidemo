@@ -113,10 +113,13 @@ export function useRideEngine() {
         );
         const wp = waypoints[wpIndex];
 
-        const boundedSpeed = 20 + Math.round(((Math.sin(elapsed * 0.9) + 1) / 2) * 5);
+        // Use waypoint speed data with slight natural variation
+        const baseSpeed = wp.speed || 20;
+        const variation = Math.sin(elapsed * 1.2) * 3 + Math.sin(elapsed * 0.4) * 2;
+        const realisticSpeed = Math.max(0, Math.round(baseSpeed + variation));
 
         setCurrentStreet(wp.streetName);
-        setSpeed(boundedSpeed);
+        setSpeed(realisticSpeed);
 
         if (wp.turnInstruction) {
           setNextTurn(wp.turnInstruction);
