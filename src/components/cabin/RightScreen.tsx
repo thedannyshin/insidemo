@@ -88,11 +88,9 @@ const RideControls = ({ onStart }: { onStart: () => void }) => {
             key={label}
             className="flex-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
             style={{
-              background: startsRide
-                ? 'linear-gradient(135deg, hsl(195 100% 50%), hsl(280 80% 60%))'
-                : 'hsl(220 18% 12% / 0.8)',
-              color: startsRide ? 'hsl(220 20% 4%)' : 'rgba(200, 220, 240, 0.8)',
-              border: startsRide ? 'none' : '1px solid hsl(220 15% 22% / 0.5)',
+              background: 'hsl(220 18% 12% / 0.8)',
+              color: 'rgba(200, 220, 240, 0.8)',
+              border: '1px solid hsl(220 15% 22% / 0.5)',
             }}
             onClick={() => {
               if (startsRide && phase === 'pre-ride') onStart();
