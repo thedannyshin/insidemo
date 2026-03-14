@@ -45,6 +45,7 @@ interface RideState {
   viewMode: ViewMode;
   passengerName: string;
   destination: string;
+  selectedVideoId: string;
   cabinMode: CabinMode;
 
   // Route state
