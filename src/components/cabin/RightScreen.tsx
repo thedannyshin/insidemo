@@ -1,6 +1,6 @@
 import { useRideStore } from '@/store/rideStore';
 import { VIDEO_DESTINATIONS } from '@/lib/videoDestinations';
-import { useState, useMemo } from 'react';
+
 
 const RightScreen = ({
   onStartRide,
@@ -59,16 +59,6 @@ const PreRideNav = ({
   onStart: () => void;
 }) => {
   const { selectedVideoId, setSelectedVideoId, setDestination } = useRideStore();
-  const [expandedCity, setExpandedCity] = useState<string | null>(null);
-
-  const cities = useMemo(() => {
-    const map = new Map<string, typeof VIDEO_DESTINATIONS>();
-    VIDEO_DESTINATIONS.forEach((d) => {
-      if (!map.has(d.city)) map.set(d.city, []);
-      map.get(d.city)!.push(d);
-    });
-    return Array.from(map.entries());
-  }, []);
 
   const selected = VIDEO_DESTINATIONS.find((d) => d.videoId === selectedVideoId);
 
@@ -78,72 +68,48 @@ const PreRideNav = ({
   };
 
   return (
-    <div className="flex flex-col h-full gap-1.5">
-      <div className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground insidemo-mono">
+    <div className="flex flex-col h-full gap-1">
+      <div className="text-[8px] tracking-[0.2em] uppercase text-muted-foreground insidemo-mono mb-0.5">
         Choose Destination
       </div>
 
-      {/* Destination list grouped by city */}
-      <div className="flex-1 overflow-y-auto pr-1" style={{ maxHeight: 120, scrollbarWidth: 'thin' }}>
-        {cities.map(([city, destinations]) => (
-          <div key={city} className="mb-1">
-            <button
-              className="w-full text-left text-[9px] font-bold uppercase tracking-wider insidemo-mono px-1.5 py-0.5 rounded"
-              style={{
-                color: expandedCity === city || (!expandedCity && destinations.some(d => d.videoId === selectedVideoId))
-                  ? 'hsl(195 100% 50%)'
-                  : 'rgba(200, 220, 240, 0.5)',
-              }}
-              onClick={() => setExpandedCity(expandedCity === city ? null : city)}
-            >
-              {city} ({destinations.length})
-            </button>
-            {(expandedCity === city || (!expandedCity && destinations.some(d => d.videoId === selectedVideoId))) && (
-              <div className="flex flex-col gap-0.5 ml-1">
-                {destinations.map((dest) => {
-                  const isActive = dest.videoId === selectedVideoId;
-                  return (
-                    <button
-                      key={dest.id}
-                      className="w-full text-left rounded-md px-2 py-1 transition-all text-[10px]"
-                      style={{
-                        background: isActive
-                          ? 'hsl(195 100% 50% / 0.12)'
-                          : 'transparent',
-                        border: isActive
-                          ? '1px solid hsl(195 100% 50% / 0.3)'
-                          : '1px solid transparent',
-                        color: isActive
-                          ? 'hsl(195 100% 70%)'
-                          : 'rgba(200, 220, 240, 0.7)',
-                      }}
-                      onClick={() => handleSelect(dest)}
-                    >
-                      <span className="mr-1">{dest.emoji}</span>
-                      {dest.landmark}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Selected destination display */}
-      {selected && (
-        <div className="insidemo-glass rounded-lg px-2 py-1.5 flex items-center gap-2">
-          <span className="text-sm">{selected.emoji}</span>
-          <div>
-            <div className="text-[10px] font-medium">{selected.landmark}</div>
-            <div className="text-[8px] text-muted-foreground">{selected.city} • 360° VR</div>
-          </div>
+      {/* Simple flat scrollable list */}
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{ scrollbarWidth: 'thin', minHeight: 0 }}
+      >
+        <div className="flex flex-col gap-[3px]">
+          {VIDEO_DESTINATIONS.map((dest) => {
+            const isActive = dest.videoId === selectedVideoId;
+            return (
+              <button
+                key={dest.id}
+                className="w-full text-left rounded-md px-2 py-[6px] transition-all flex items-center gap-1.5"
+                style={{
+                  background: isActive
+                    ? 'hsl(195 100% 50% / 0.15)'
+                    : 'hsl(220 18% 12% / 0.5)',
+                  border: isActive
+                    ? '1px solid hsl(195 100% 50% / 0.4)'
+                    : '1px solid hsl(220 15% 20% / 0.3)',
+                  color: isActive
+                    ? 'hsl(195 100% 70%)'
+                    : 'rgba(200, 220, 240, 0.75)',
+                }}
+                onClick={() => handleSelect(dest)}
+              >
+                <span className="text-xs flex-shrink-0">{dest.emoji}</span>
+                <span className="text-[10px] leading-tight truncate">{dest.landmark}</span>
+                <span className="text-[7px] text-muted-foreground ml-auto flex-shrink-0 insidemo-mono">{dest.city.split(' ')[0]}</span>
+              </button>
+            );
+          })}
         </div>
-      )}
+      </div>
 
       {/* Go button */}
       <button
-        className="w-full py-1.5 rounded-lg text-xs font-medium transition-all"
+        className="w-full py-1.5 rounded-lg text-[11px] font-semibold transition-all mt-0.5 flex-shrink-0"
         style={{
           background: 'linear-gradient(135deg, hsl(195 100% 50%), hsl(280 80% 60%))',
           color: 'hsl(220 20% 4%)',
