@@ -158,7 +158,7 @@ function onYouTubeIframeAPIReady(){
   player=new YT.Player("player",{
     videoId:"${selectedVideoId}",
     playerVars:{
-      autoplay:1,
+      autoplay:0,
       mute:1,
       controls:0,
       disablekb:1,
@@ -176,7 +176,7 @@ function onYouTubeIframeAPIReady(){
       onReady:function(e){
         ready=true;
         duration=e.target.getDuration()||1;
-        e.target.playVideo();
+        // Don't auto-play — wait for 'play' command
         parent.postMessage("yt360_ready","*");
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
