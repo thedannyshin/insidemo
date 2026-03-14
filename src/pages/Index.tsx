@@ -6,6 +6,13 @@ import { Suspense } from 'react';
 
 const Index = () => {
   const { startRide, stopRide, replayRide } = useRideEngine();
+
+  // Listen for stop_ride event from vehicle controls
+  React.useEffect(() => {
+    const handler = () => stopRide();
+    window.addEventListener('stop_ride', handler);
+    return () => window.removeEventListener('stop_ride', handler);
+  }, [stopRide]);
   const phase = useRideStore((s) => s.phase);
   const viewMode = useRideStore((s) => s.viewMode);
   const setViewMode = useRideStore((s) => s.setViewMode);
