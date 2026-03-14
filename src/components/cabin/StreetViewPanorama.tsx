@@ -15,6 +15,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
+  const initialHeading = useRideStore((s) => s.initialHeading);
   const setEta = useRideStore((s) => s.setEta);
   const selectedVideoId = useRideStore((s) => s.selectedVideoId);
   const rotation = useCameraOffset((s) => s.rotation);
