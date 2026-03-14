@@ -36,9 +36,8 @@ const RideControls = ({ onStart }: { onStart: () => void }) => {
   };
 
   const controls = [
-    { label: 'Go', emoji: '🟢', command: 'play', startsRide: true },
-    { label: 'Stop', emoji: '🛑', command: 'pause', startsRide: false },
-    { label: 'Pull Over', emoji: '🅿️', command: 'pause', startsRide: false },
+    { label: 'Start Ride', emoji: '🟢', command: 'play', startsRide: true },
+    { label: 'Stop Ride', emoji: '🛑', command: 'pause', startsRide: false },
   ] as const;
 
   return (
@@ -97,7 +96,7 @@ const RideControls = ({ onStart }: { onStart: () => void }) => {
             }}
             onClick={() => {
               if (startsRide && phase === 'pre-ride') onStart();
-              if (label === 'Stop') {
+              if (label === 'Stop Ride') {
                 window.dispatchEvent(new CustomEvent('stop_ride'));
               }
               window.dispatchEvent(new CustomEvent('video_control', { detail: command }));
