@@ -160,11 +160,11 @@ const CabinScene3D = ({
       scale={hudScale}
       style={{ pointerEvents: 'auto' }}
     >
-      <div style={{
+      <div data-cabin-panel style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
       }}>
         <HUDOverlay />
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div data-cabin-panel style={{ display: 'flex', gap: 12 }}>
           <div style={{
             width: 360, height: 200, borderRadius: 12, overflow: 'hidden',
             boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
