@@ -97,6 +97,9 @@ const RideControls = ({ onStart }: { onStart: () => void }) => {
             }}
             onClick={() => {
               if (startsRide && phase === 'pre-ride') onStart();
+              if (label === 'Stop') {
+                window.dispatchEvent(new CustomEvent('stop_ride'));
+              }
               window.dispatchEvent(new CustomEvent('video_control', { detail: command }));
             }}
           >
