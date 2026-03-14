@@ -176,6 +176,17 @@ export function useRideEngine() {
     frameRef.current = requestAnimationFrame(rampUp);
   }, [setPhase, setSpeed, setRideStartTime, setMusic, incidents, firedIncidentIds]);
 
+  const stopRide = useCallback(() => {
+    incidentQueueRef.current = [];
+    if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    window.speechSynthesis?.cancel();
+    setSpeed(0);
+    setPhase('pre-ride');
+    setMusic({ isPlaying: false });
+    clearIncident();
+  }, [setSpeed, setPhase, setMusic, clearIncident]);
+
   const replayRide = useCallback(() => {
     incidentQueueRef.current = [];
     if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
