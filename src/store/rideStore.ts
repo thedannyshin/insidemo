@@ -47,6 +47,7 @@ interface RideState {
   destination: string;
   selectedVideoId: string;
   cabinMode: CabinMode;
+  initialHeading: number;
 
   // Route state
   speed: number;
@@ -71,6 +72,7 @@ interface RideState {
   setDestination: (destination: string) => void;
   setSelectedVideoId: (videoId: string) => void;
   setCabinMode: (mode: CabinMode) => void;
+  setInitialHeading: (heading: number) => void;
   setSpeed: (speed: number) => void;
   setCurrentStreet: (street: string) => void;
   setNextTurn: (turn: string) => void;
