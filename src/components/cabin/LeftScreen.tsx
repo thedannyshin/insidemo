@@ -22,22 +22,72 @@ const LeftScreen = () => {
   );
 };
 
-const PreRideView = ({ name }: { name: string }) => (
-  <div className="flex flex-col items-center justify-center h-full gap-3">
-    <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground insidemo-mono">
-      InsideMo
+const PreRideView = ({ name }: { name: string }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  useEffect(() => {
+    // Load Google Maps script if not already loaded
+    if ((window as any).google?.maps) {
+      setMapLoaded(true);
+      return;
+    }
+    const existing = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
+    if (existing) {
+      existing.addEventListener('load', () => setMapLoaded(true));
+      if ((window as any).google?.maps) setMapLoaded(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}`;
+    script.async = true;
+    script.onload = () => setMapLoaded(true);
+    document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current) return;
+    const google = (window as any).google;
+    if (!google?.maps) return;
+
+    const center = { lat: 37.78576, lng: -122.40587 };
+    const map = new google.maps.Map(mapRef.current, {
+      center,
+      zoom: 16,
+      tilt: 45,
+      heading: 0,
+      mapId: 'DEMO_MAP_ID',
+      disableDefaultUI: true,
+      gestureHandling: 'none',
+      keyboardShortcuts: false,
+    });
+
+    // Slowly rotate the map heading
+    let heading = 0;
+    const interval = setInterval(() => {
+      heading = (heading + 0.3) % 360;
+      map.setHeading(heading);
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [mapLoaded]);
+
+  return (
+    <div className="relative w-full h-full overflow-hidden rounded-lg">
+      <div ref={mapRef} className="absolute inset-0" />
+      {/* Overlay with passenger info */}
+      <div className="absolute inset-0 flex flex-col items-center justify-end pb-4 z-10"
+        style={{ background: 'linear-gradient(to bottom, transparent 40%, hsl(220 18% 8% / 0.85) 100%)' }}>
+        <h2 className="text-sm font-semibold insidemo-gradient-text">
+          Welcome back, {name}
+        </h2>
+        <p className="text-[9px] text-muted-foreground mt-1">
+          Your autonomous ride awaits
+        </p>
+      </div>
     </div>
-    <h2 className="text-lg font-semibold insidemo-gradient-text">
-      Welcome back, {name}
-    </h2>
-    <p className="text-[10px] text-muted-foreground">
-      Your autonomous ride awaits
-    </p>
-    <div className="mt-2 w-24 h-[2px] rounded-full" style={{
-      background: 'linear-gradient(90deg, hsl(195 100% 50%), hsl(280 80% 60%))'
-    }} />
-  </div>
-);
+  );
+};
 
 const EntertainmentView = ({
   music,
