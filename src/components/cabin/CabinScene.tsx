@@ -194,8 +194,13 @@ const CabinScene = ({
   onReplay: () => void;
 }) => (
   <div className="w-full h-screen relative" style={{ background: '#000' }}>
+    {/* Street View panorama as full background */}
     <StreetViewPanorama />
+
+    {/* Transparent overlay — pass through pointer events so Html panels remain interactive */}
     <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }} />
+
+    {/* 3D cabin overlay with transparent background */}
     <Canvas
       camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
       gl={{

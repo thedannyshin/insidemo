@@ -15,7 +15,6 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
-  const initialHeading = useRideStore((s) => s.initialHeading);
   const setEta = useRideStore((s) => s.setEta);
   const selectedVideoId = useRideStore((s) => s.selectedVideoId);
   const rotation = useCameraOffset((s) => s.rotation);
@@ -85,16 +84,16 @@ const StreetViewPanorama = () => {
     if (!playerReady) return;
 
     const rd = routeDataRef.current;
-    let iHeading = initialHeading; // AI-detected or default heading
+    let iHeading = 315; // default heading
 
-    if (phase === 'riding' && rd?.waypoints?.length && routeProgress > 0) {
+    if (rd?.waypoints?.length) {
       const waypoints = rd.waypoints;
       const totalWp = waypoints.length;
       const floatIndex = routeProgress * (totalWp - 1);
       const idxA = Math.min(Math.floor(floatIndex), totalWp - 1);
       const idxB = Math.min(idxA + 1, totalWp - 1);
       const subT = floatIndex - idxA;
-      iHeading = lerpAngle(waypoints[idxA].heading ?? initialHeading, waypoints[idxB].heading ?? initialHeading, subT);
+      iHeading = lerpAngle(waypoints[idxA].heading ?? 315, waypoints[idxB].heading ?? 315, subT);
     }
 
     const videoMaxH = useCameraBase.getState().videoMaxH;
@@ -117,7 +116,7 @@ const StreetViewPanorama = () => {
       pitch: finalPitch,
     });
 
-  }, [routeProgress, phase, rotation, postToIframe, playerReady, initialHeading]);
+  }, [routeProgress, phase, rotation, postToIframe, playerReady]);
 
   // Build the srcdoc HTML for the YouTube 360 player
   const srcdoc = `<!DOCTYPE html>
@@ -197,7 +196,7 @@ function onYouTubeIframeAPIReady(){
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
         // Enforce POV periodically to prevent YouTube auto-rotation
-        povEnforcer=setInterval(setPov,10);
+        povEnforcer=setInterval(setPov,200);
         setPov();
       },
       onStateChange:function(e){

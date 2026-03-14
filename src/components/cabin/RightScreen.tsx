@@ -1,6 +1,5 @@
 import { useRideStore } from '@/store/rideStore';
 import { VIDEO_DESTINATIONS } from '@/lib/videoDestinations';
-import { supabase } from '@/integrations/supabase/client';
 
 
 const RightScreen = ({
@@ -27,26 +26,13 @@ const RightScreen = ({
 };
 
 const RideControls = ({ onStart }: { onStart: () => void }) => {
-  const { selectedVideoId, setSelectedVideoId, setDestination, setInitialHeading, phase } = useRideStore();
+  const { selectedVideoId, setSelectedVideoId, setDestination, phase } = useRideStore();
   const isRiding = phase === 'takeoff' || phase === 'riding';
 
-  const handleSelect = async (dest: typeof VIDEO_DESTINATIONS[0]) => {
-    if (isRiding) return;
+  const handleSelect = (dest: typeof VIDEO_DESTINATIONS[0]) => {
+    if (isRiding) return; // can't change destination mid-ride
     setSelectedVideoId(dest.videoId);
     setDestination(`${dest.landmark}, ${dest.city}`);
-
-    // Detect heading via AI
-    try {
-      const { data, error } = await supabase.functions.invoke('detect-heading', {
-        body: { videoId: dest.videoId },
-      });
-      if (!error && data?.heading != null) {
-        setInitialHeading(data.heading);
-        console.log(`[InsideMo] AI heading for ${dest.city}: ${data.heading}°`);
-      }
-    } catch (e) {
-      console.warn('[InsideMo] Heading detection failed, using default', e);
-    }
   };
 
   const controls = [
