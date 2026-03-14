@@ -5,7 +5,7 @@ import { useRideStore } from '@/store/rideStore';
 import { Suspense } from 'react';
 
 const Index = () => {
-  const { startRide, replayRide } = useRideEngine();
+  const { startRide, stopRide, replayRide } = useRideEngine();
   const phase = useRideStore((s) => s.phase);
   const viewMode = useRideStore((s) => s.viewMode);
   const setViewMode = useRideStore((s) => s.setViewMode);
