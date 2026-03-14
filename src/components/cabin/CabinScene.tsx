@@ -29,7 +29,12 @@ const CameraController = () => {
   const lastPointer = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    const isInsideHtmlPanel = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      return !!target.closest('[data-cabin-panel]');
+    };
     const onPointerDown = (e: PointerEvent) => {
+      if (isInsideHtmlPanel(e.target)) return;
       isDragging.current = true;
       lastPointer.current = { x: e.clientX, y: e.clientY };
     };
@@ -42,6 +47,7 @@ const CameraController = () => {
     };
     const onPointerUp = () => { isDragging.current = false; };
     const onWheel = (e: WheelEvent) => {
+      if (isInsideHtmlPanel(e.target)) return;
       e.preventDefault();
       zoom(e.deltaY * 0.05);
     };
