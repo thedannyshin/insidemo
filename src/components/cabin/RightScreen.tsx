@@ -1,6 +1,6 @@
 import { useRideStore } from '@/store/rideStore';
 import { VIDEO_DESTINATIONS } from '@/lib/videoDestinations';
-import { useState, useMemo } from 'react';
+
 
 const RightScreen = ({
   onStartRide,
