@@ -168,7 +168,7 @@ export function useRideEngine() {
     },
     [
       processQueue, setRideElapsed, setRouteProgress, setCurrentStreet,
-      setSpeed, setEta, setNextTurn, setPhase, setMusic,
+      setSpeed, setNextTurn, setPhase, setMusic,
     ]
   );
 
