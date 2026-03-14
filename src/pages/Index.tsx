@@ -2,7 +2,7 @@ import CabinScene from '@/components/cabin/CabinScene';
 import BirdEyeView from '@/components/cabin/BirdEyeView';
 import { useRideEngine } from '@/hooks/useRideEngine';
 import { useRideStore } from '@/store/rideStore';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 const Index = () => {
   const { startRide, stopRide, replayRide } = useRideEngine();
