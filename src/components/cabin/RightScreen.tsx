@@ -112,19 +112,23 @@ const PreRideNav = ({
         </select>
       </div>
 
-      {/* Quick pick chips */}
+      {/* Vehicle control chips */}
       <div className="flex flex-wrap gap-1 mt-1">
-        {PRESET_ROUTES.slice(0, 3).map(({ name, emoji }) => (
+        {[
+          { label: 'Stop', emoji: '🛑', action: 'pause' },
+          { label: 'Go', emoji: '🟢', action: 'play' },
+          { label: 'Pull Over', emoji: '🅿️', action: 'pause' },
+        ].map(({ label, emoji, action }) => (
           <button
-            key={name}
+            key={label}
             className="text-[8px] px-2 py-1 rounded-full transition-colors"
             style={{
-              background: destination === name ? 'hsl(195 100% 50% / 0.2)' : 'hsl(195 100% 50% / 0.08)',
-              border: `1px solid ${destination === name ? 'hsl(195 100% 50% / 0.5)' : 'hsl(195 100% 50% / 0.2)'}`,
+              background: 'hsl(195 100% 50% / 0.08)',
+              border: '1px solid hsl(195 100% 50% / 0.2)',
             }}
-            onClick={() => setDestination(name)}
+            onClick={() => window.dispatchEvent(new CustomEvent('video_control', { detail: action }))}
           >
-            {emoji} {name}
+            {emoji} {label}
           </button>
         ))}
       </div>
