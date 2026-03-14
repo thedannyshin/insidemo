@@ -2,10 +2,17 @@ import CabinScene from '@/components/cabin/CabinScene';
 import BirdEyeView from '@/components/cabin/BirdEyeView';
 import { useRideEngine } from '@/hooks/useRideEngine';
 import { useRideStore } from '@/store/rideStore';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 const Index = () => {
-  const { startRide, replayRide } = useRideEngine();
+  const { startRide, stopRide, replayRide } = useRideEngine();
+
+  // Listen for stop_ride event from vehicle controls
+  useEffect(() => {
+    const handler = () => stopRide();
+    window.addEventListener('stop_ride', handler);
+    return () => window.removeEventListener('stop_ride', handler);
+  }, [stopRide]);
   const phase = useRideStore((s) => s.phase);
   const viewMode = useRideStore((s) => s.viewMode);
   const setViewMode = useRideStore((s) => s.setViewMode);
