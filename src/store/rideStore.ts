@@ -102,6 +102,7 @@ export const useRideStore = create<RideState>((set) => ({
   destination: '',
   selectedVideoId: DEFAULT_VIDEO_ID,
   cabinMode: 'entertainment',
+  initialHeading: 315,
   speed: 0,
   currentStreet: 'Market Street',
   nextTurn: '',
