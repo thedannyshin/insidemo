@@ -156,7 +156,7 @@ function animatePov(){
 
 function onYouTubeIframeAPIReady(){
   player=new YT.Player("player",{
-    videoId:"${YOUTUBE_VIDEO_ID}",
+    videoId:"${selectedVideoId}",
     playerVars:{
       autoplay:1,
       mute:1,
