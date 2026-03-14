@@ -176,7 +176,12 @@ function onYouTubeIframeAPIReady(){
       onReady:function(e){
         ready=true;
         duration=e.target.getDuration()||1;
-        // Don't auto-play — wait for 'play' command
+        // Show first frame: seek to 0 and pause
+        e.target.mute();
+        e.target.seekTo(0,true);
+        e.target.playVideo();
+        // Pause after a brief moment to render first frame
+        setTimeout(function(){ e.target.pauseVideo(); },300);
         parent.postMessage("yt360_ready","*");
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
