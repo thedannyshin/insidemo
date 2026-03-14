@@ -17,6 +17,7 @@ const YOUTUBE_VIDEO_ID = 'c9OcB9CzKpA';
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
+  const setEta = useRideStore((s) => s.setEta);
   const rotation = useCameraOffset((s) => s.rotation);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeDataRef = useRef<any>(null);
@@ -38,13 +39,28 @@ const StreetViewPanorama = () => {
       });
   }, []);
 
-  // Listen for player ready message and video control commands
+  // Listen for player ready message, ETA updates and video control commands
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data === 'yt360_ready') {
         playerReadyRef.current = true;
+        return;
+      }
+
+      if (
+        e.data &&
+        typeof e.data === 'object' &&
+        'type' in e.data &&
+        (e.data as { type?: string }).type === 'yt360_time' &&
+        'remaining' in e.data
+      ) {
+        const remaining = Number((e.data as { remaining?: number }).remaining);
+        if (Number.isFinite(remaining)) {
+          setEta(Math.max(0, Math.round(remaining)));
+        }
       }
     };
+
     const controlHandler = (e: Event) => {
       const cmd = (e as CustomEvent).detail;
       if (cmd === 'play' || cmd === 'pause') {
@@ -57,7 +73,7 @@ const StreetViewPanorama = () => {
       window.removeEventListener('message', handler);
       window.removeEventListener('video_control', controlHandler);
     };
-  }, [postToIframe]);
+  }, [postToIframe, setEta]);
 
   // Sync heading/pitch and video timeline with route progress
   useEffect(() => {

@@ -9,10 +9,10 @@ type IncidentEvent = {
 
 export function useRideEngine() {
   const {
-    phase, setPhase, speed, setSpeed, setEta, setCurrentStreet,
+    setPhase, setSpeed, setCurrentStreet,
     setNextTurn, setRouteProgress, incidents, setIncidents,
-    fireIncident, clearIncident, activeIncident, firedIncidentIds,
-    rideStartTime, setRideStartTime, setRideElapsed, setMusic, resetRide,
+    fireIncident, clearIncident, firedIncidentIds,
+    setRideStartTime, setRideElapsed, setMusic, resetRide,
   } = useRideStore();
 
   const frameRef = useRef<number>();
