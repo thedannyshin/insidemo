@@ -98,6 +98,7 @@ export const useRideStore = create<RideState>((set) => ({
   viewMode: 'cabin',
   passengerName: 'Alex',
   destination: '',
+  selectedVideoId: DEFAULT_VIDEO_ID,
   cabinMode: 'entertainment',
   speed: 0,
   currentStreet: 'Market Street',
