@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
 
 const LeftScreen = () => {
