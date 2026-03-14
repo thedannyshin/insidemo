@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
 import { useCameraOffset } from './CameraControls';
 import { useCameraBase } from './CameraDebugSliders';
@@ -20,11 +20,16 @@ const StreetViewPanorama = () => {
   const rotation = useCameraOffset((s) => s.rotation);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeDataRef = useRef<any>(null);
-  const playerReadyRef = useRef(false);
+  const [playerReady, setPlayerReady] = useState(false);
 
   const postToIframe = useCallback((msg: Record<string, unknown>) => {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify(msg), '*');
   }, []);
+
+  // Reset ready state when video changes
+  useEffect(() => {
+    setPlayerReady(false);
+  }, [selectedVideoId]);
 
   // Load route data
   useEffect(() => {
@@ -42,7 +47,7 @@ const StreetViewPanorama = () => {
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data === 'yt360_ready') {
-        playerReadyRef.current = true;
+        setPlayerReady(true);
         return;
       }
 
@@ -76,7 +81,7 @@ const StreetViewPanorama = () => {
 
   // Sync heading/pitch and video timeline with route progress
   useEffect(() => {
-    if (!playerReadyRef.current) return;
+    if (!playerReady) return;
 
     const rd = routeDataRef.current;
     let iHeading = 315; // default heading
@@ -111,7 +116,7 @@ const StreetViewPanorama = () => {
       pitch: finalPitch,
     });
 
-  }, [routeProgress, phase, rotation, postToIframe]);
+  }, [routeProgress, phase, rotation, postToIframe, playerReady]);
 
   // Build the srcdoc HTML for the YouTube 360 player
   const srcdoc = `<!DOCTYPE html>
