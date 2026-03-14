@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-
+import { DEFAULT_VIDEO_ID } from '@/lib/videoDestinations';
 export type RidePhase = 'pre-ride' | 'takeoff' | 'riding' | 'arrived';
 export type ViewMode = 'cabin' | 'birdseye';
 export type CabinMode = 'entertainment' | 'business' | 'relax' | 'party';
