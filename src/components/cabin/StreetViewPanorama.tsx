@@ -182,6 +182,13 @@ function onYouTubeIframeAPIReady(){
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
         animatePov();
+      },
+      onStateChange:function(e){
+        // YT.PlayerState.ENDED === 0 — seek back to freeze on last frame
+        if(e.data===0&&duration>0){
+          player.seekTo(duration-0.5,true);
+          player.pauseVideo();
+        }
       }
     }
   });
