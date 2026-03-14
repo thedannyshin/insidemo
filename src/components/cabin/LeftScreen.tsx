@@ -1,175 +1,145 @@
-import { useEffect, useRef, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
 
 const LeftScreen = () => {
-  const { phase, passengerName, activeIncident } = useRideStore();
-
-  const isDimmed = activeIncident?.active;
+  const { phase, activeIncident, firedIncidentIds, incidents } = useRideStore();
 
   return (
     <div
-      className={`insidemo-screen w-full h-full relative transition-all duration-400 ${
-        isDimmed ? 'insidemo-incident-dim' : ''
-      }`}
+      data-cabin-panel
+      className="insidemo-screen w-full h-full relative"
       style={{ width: '100%', height: '100%', padding: 0 }}
     >
-      {phase === 'arrived' ? <ArrivalView /> : <NavigationMapView name={passengerName} />}
+      {phase === 'arrived' ? <ArrivalView /> : <SafetyPanel />}
     </div>
   );
 };
 
-const NavigationMapView = ({ name }: { name: string }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const mapInstanceRef = useRef<any>(null);
+const SafetyPanel = () => {
   const phase = useRideStore((s) => s.phase);
-  const routeProgress = useRideStore((s) => s.routeProgress);
-  const destination = useRideStore((s) => s.destination);
+  const activeIncident = useRideStore((s) => s.activeIncident);
+  const firedIncidentIds = useRideStore((s) => s.firedIncidentIds);
+  const incidents = useRideStore((s) => s.incidents);
 
-  useEffect(() => {
-    if ((window as any).google?.maps) {
-      setMapLoaded(true);
-      return;
-    }
-    const existing = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
-    if (existing) {
-      existing.addEventListener('load', () => setMapLoaded(true));
-      if ((window as any).google?.maps) setMapLoaded(true);
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''}`;
-    script.async = true;
-    script.onload = () => setMapLoaded(true);
-    document.head.appendChild(script);
-  }, []);
+  const severityColors: Record<string, string> = {
+    alert: 'hsl(0 85% 55%)',
+    caution: 'hsl(38 92% 50%)',
+    info: 'hsl(195 100% 50%)',
+  };
+  const severityIcons: Record<string, string> = {
+    alert: '🛑',
+    caution: '⚠️',
+    info: 'ℹ️',
+  };
 
-  useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return;
-    const google = (window as any).google;
-    if (!google?.maps) return;
-
-    const origin = { lat: 37.78576, lng: -122.40587 };
-    const dest = { lat: 37.8086, lng: -122.41251 };
-
-    const map = new google.maps.Map(mapRef.current, {
-      center: origin,
-      zoom: 15,
-      disableDefaultUI: true,
-      gestureHandling: 'none',
-      keyboardShortcuts: false,
-      styles: [
-        { elementType: 'geometry', stylers: [{ color: '#1a1a2e' }] },
-        { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a2e' }] },
-        { elementType: 'labels.text.fill', stylers: [{ color: '#6a7a8a' }] },
-        { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2a2a4a' }] },
-        { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#1a1a3a' }] },
-        { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3a3a5a' }] },
-        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e1a2b' }] },
-        { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-        { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-      ],
-    });
-    mapInstanceRef.current = map;
-
-    // Render directions route
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer({
-      map,
-      suppressMarkers: true,
-      polylineOptions: {
-        strokeColor: '#00bfff',
-        strokeWeight: 4,
-        strokeOpacity: 0.8,
-      },
-    });
-
-    directionsService.route(
-      {
-        origin,
-        destination: dest,
-        travelMode: google.maps.TravelMode.DRIVING,
-      },
-      (result: any, status: string) => {
-        if (status === 'OK') {
-          directionsRenderer.setDirections(result);
-        }
-      }
-    );
-
-    // Origin marker
-    new google.maps.Marker({
-      position: origin,
-      map,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 6,
-        fillColor: '#00bfff',
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 2,
-      },
-    });
-
-    // Destination marker
-    new google.maps.Marker({
-      position: dest,
-      map,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 6,
-        fillColor: '#a855f7',
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 2,
-      },
-    });
-
-    return () => {
-      mapInstanceRef.current = null;
-    };
-  }, [mapLoaded]);
-
-  // Update map center based on ride progress
-  useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    if (phase === 'pre-ride') return;
-
-    const origin = { lat: 37.78576, lng: -122.40587 };
-    const dest = { lat: 37.8086, lng: -122.41251 };
-    const t = routeProgress;
-    const lat = origin.lat + (dest.lat - origin.lat) * t;
-    const lng = origin.lng + (dest.lng - origin.lng) * t;
-    mapInstanceRef.current.panTo({ lat, lng });
-  }, [routeProgress, phase]);
+  const pastIncidents = incidents.filter((inc) => firedIncidentIds.includes(inc.id));
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <div ref={mapRef} className="absolute inset-0" />
-      {/* Top overlay with label */}
-      <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-1 rounded"
-        style={{ background: 'hsl(220 18% 8% / 0.7)', backdropFilter: 'blur(8px)' }}>
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#00bfff' }} />
-        <span className="text-[8px] tracking-[0.15em] uppercase insidemo-mono" style={{ color: '#00bfff' }}>
-          {phase === 'pre-ride' ? 'Route Preview' : 'Live Navigation'}
+    <div className="flex flex-col h-full p-3 gap-2">
+      {/* Header */}
+      <div className="flex items-center gap-1.5">
+        <div
+          className="w-1.5 h-1.5 rounded-full"
+          style={{
+            background: activeIncident?.active
+              ? severityColors[activeIncident.severity]
+              : 'hsl(195 100% 50%)',
+            boxShadow: activeIncident?.active
+              ? `0 0 8px ${severityColors[activeIncident.severity]}`
+              : 'none',
+          }}
+        />
+        <span
+          className="text-[8px] tracking-[0.15em] uppercase insidemo-mono"
+          style={{ color: 'hsl(195 100% 50%)' }}
+        >
+          Safety Monitor
         </span>
       </div>
-      {/* Bottom greeting overlay for pre-ride */}
+
+      {/* Active incident — prominent */}
+      {activeIncident?.active && (
+        <div
+          className="rounded-lg p-2.5 animate-slide-up"
+          style={{
+            background: `${severityColors[activeIncident.severity]}08`,
+            border: `1px solid ${severityColors[activeIncident.severity]}35`,
+            boxShadow: `0 0 20px -8px ${severityColors[activeIncident.severity]}40`,
+          }}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className="text-xs">{severityIcons[activeIncident.severity]}</span>
+            <span
+              className="text-[8px] font-bold uppercase tracking-wider insidemo-mono"
+              style={{ color: severityColors[activeIncident.severity] }}
+            >
+              {activeIncident.type.replace('_', ' ')}
+            </span>
+          </div>
+          <p className="text-[11px] font-semibold leading-tight mb-1">{activeIncident.headline}</p>
+          <p
+            className="text-[9px] leading-relaxed"
+            style={{ color: 'rgba(200, 220, 240, 0.7)' }}
+          >
+            {activeIncident.explanation}
+          </p>
+        </div>
+      )}
+
+      {/* Past incidents log */}
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin', minHeight: 0 }}>
+        {phase === 'pre-ride' && (
+          <div className="flex flex-col items-center justify-center h-full gap-2 opacity-50">
+            <span className="text-lg">🛡️</span>
+            <p className="text-[9px] text-muted-foreground text-center insidemo-mono">
+              Safety alerts will appear here during your ride
+            </p>
+          </div>
+        )}
+
+        {(phase === 'takeoff' || phase === 'riding') && pastIncidents.length === 0 && !activeIncident?.active && (
+          <div className="flex flex-col items-center justify-center h-full gap-1 opacity-40">
+            <span className="text-sm">✅</span>
+            <p className="text-[8px] text-muted-foreground text-center insidemo-mono">
+              All clear — no incidents
+            </p>
+          </div>
+        )}
+
+        {pastIncidents
+          .filter((inc) => inc.id !== activeIncident?.id)
+          .reverse()
+          .map((inc) => (
+            <div
+              key={inc.id}
+              className="flex items-start gap-1.5 py-1.5 border-b"
+              style={{ borderColor: 'hsl(220 15% 18% / 0.5)' }}
+            >
+              <span className="text-[9px] flex-shrink-0 mt-0.5">{severityIcons[inc.severity]}</span>
+              <div className="min-w-0">
+                <p className="text-[9px] font-medium truncate">{inc.headline}</p>
+                <p className="text-[7px] text-muted-foreground insidemo-mono">
+                  {inc.hudCopy}
+                </p>
+              </div>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };
 
 const ArrivalView = () => (
   <div className="flex flex-col items-center justify-center h-full gap-3" style={{ padding: 16 }}>
-    <div className="text-lg insidemo-gradient-text font-semibold">
-      Thanks for riding
-    </div>
+    <div className="text-lg insidemo-gradient-text font-semibold">Thanks for riding</div>
     <div className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground insidemo-mono">
       Powered by InsideMo
     </div>
-    <div className="mt-1 w-16 h-[2px] rounded-full" style={{
-      background: 'linear-gradient(90deg, hsl(195 100% 50%), hsl(280 80% 60%))'
-    }} />
+    <div
+      className="mt-1 w-16 h-[2px] rounded-full"
+      style={{
+        background: 'linear-gradient(90deg, hsl(195 100% 50%), hsl(280 80% 60%))',
+      }}
+    />
   </div>
 );
 
