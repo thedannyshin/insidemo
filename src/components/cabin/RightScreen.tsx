@@ -9,36 +9,18 @@ const RightScreen = ({
   onStartRide: () => void;
   onReplay: () => void;
 }) => {
-  const {
-    phase,
-    speed,
-    currentStreet,
-    nextTurn,
-    eta,
-    activeIncident,
-    expandIncident,
-    routeProgress,
-  } = useRideStore();
+  const phase = useRideStore((s) => s.phase);
 
   return (
     <div
       className="insidemo-screen w-full h-full relative"
       style={{ width: '100%', height: '100%', padding: 16 }}
     >
-      {phase === 'pre-ride' && <PreRideNav onStart={onStartRide} />}
-
-      {(phase === 'takeoff' || phase === 'riding') && (
-        <NavigationView
-          speed={speed}
-          street={currentStreet}
-          nextTurn={nextTurn}
-          eta={eta}
-          progress={routeProgress}
-        />
+      {phase === 'arrived' ? (
+        <TripSummary onReplay={onReplay} />
+      ) : (
+        <RideControls onStart={onStartRide} />
       )}
-
-      {phase === 'arrived' && <TripSummary onReplay={onReplay} />}
-
     </div>
   );
 };
