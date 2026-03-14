@@ -111,7 +111,7 @@ const StreetViewPanorama = () => {
       pitch: finalPitch,
     });
 
-  }, [routeProgress, phase, rotation, postToIframe]);
+  }, [routeProgress, phase, rotation, postToIframe, playerReady]);
 
   // Build the srcdoc HTML for the YouTube 360 player
   const srcdoc = `<!DOCTYPE html>
