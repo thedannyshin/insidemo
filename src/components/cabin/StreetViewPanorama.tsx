@@ -173,6 +173,8 @@ window.addEventListener("message",function(e){
       player.seekTo(t,true);
     }
   }
+  if(d.type==="play"&&ready){player.playVideo();}
+  if(d.type==="pause"&&ready){player.pauseVideo();}
 });
 </script>
 <script src="https://www.youtube.com/iframe_api"></script>
