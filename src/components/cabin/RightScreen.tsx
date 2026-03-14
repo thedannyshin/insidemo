@@ -39,16 +39,6 @@ const RightScreen = ({
 
       {phase === 'arrived' && <TripSummary onReplay={onReplay} />}
 
-      {/* Incident overlay */}
-      {activeIncident?.active && (
-        <IncidentOverlay
-          severity={activeIncident.severity}
-          headline={activeIncident.headline}
-          explanation={activeIncident.explanation}
-          expanded={activeIncident.expanded}
-          onTap={expandIncident}
-        />
-      )}
     </div>
   );
 };
