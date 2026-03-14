@@ -1,15 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
 import { useRideStore } from '@/store/rideStore';
-import { supabase } from '@/integrations/supabase/client';
-
-interface PlacePrediction {
-  description: string;
-  place_id: string;
-  structured_formatting: {
-    main_text: string;
-    secondary_text: string;
-  };
-}
 
 const RightScreen = ({
   onStartRide,
@@ -19,8 +8,14 @@ const RightScreen = ({
   onReplay: () => void;
 }) => {
   const {
-    phase, destination, setDestination, speed, currentStreet,
-    nextTurn, eta, activeIncident, expandIncident, routeProgress,
+    phase,
+    speed,
+    currentStreet,
+    nextTurn,
+    eta,
+    activeIncident,
+    expandIncident,
+    routeProgress,
   } = useRideStore();
 
   return (
@@ -28,13 +23,7 @@ const RightScreen = ({
       className="insidemo-screen w-full h-full relative"
       style={{ width: '100%', height: '100%', padding: 16 }}
     >
-      {phase === 'pre-ride' && (
-        <PreRideNav
-          destination={destination}
-          setDestination={setDestination}
-          onStart={onStartRide}
-        />
-      )}
+      {phase === 'pre-ride' && <PreRideNav onStart={onStartRide} />}
 
       {(phase === 'takeoff' || phase === 'riding') && (
         <NavigationView
@@ -62,25 +51,16 @@ const RightScreen = ({
   );
 };
 
-const PRESET_ROUTES = [
-  { name: "Fisherman's Wharf", emoji: '🦀', distance: '2.6 mi', duration: '~12 min' },
-  { name: 'Golden Gate Bridge', emoji: '🌉', distance: '4.8 mi', duration: '~18 min' },
-  { name: 'Union Square', emoji: '🛍️', distance: '1.1 mi', duration: '~6 min' },
-  { name: 'Lombard Street', emoji: '🌀', distance: '3.2 mi', duration: '~14 min' },
-  { name: 'Twin Peaks', emoji: '⛰️', distance: '5.5 mi', duration: '~22 min' },
-  { name: 'AT&T Park', emoji: '⚾', distance: '1.8 mi', duration: '~8 min' },
-];
-
 const PreRideNav = ({
-  destination,
-  setDestination,
   onStart,
 }: {
-  destination: string;
-  setDestination: (d: string) => void;
   onStart: () => void;
 }) => {
-  const selected = PRESET_ROUTES.find((r) => r.name === destination);
+  const controls = [
+    { label: 'Stop', emoji: '🛑', command: 'pause', startsRide: false },
+    { label: 'Go', emoji: '🟢', command: 'play', startsRide: true },
+    { label: 'Pull Over', emoji: '🅿️', command: 'pause', startsRide: false },
+  ] as const;
 
   return (
     <div className="flex flex-col h-full gap-2">
@@ -100,11 +80,7 @@ const PreRideNav = ({
 
       {/* Vehicle control chips */}
       <div className="flex flex-wrap gap-1 mt-1">
-        {[
-          { label: 'Stop', emoji: '🛑', action: 'pause' },
-          { label: 'Go', emoji: '🟢', action: 'play' },
-          { label: 'Pull Over', emoji: '🅿️', action: 'pause' },
-        ].map(({ label, emoji, action }) => (
+        {controls.map(({ label, emoji, command, startsRide }) => (
           <button
             key={label}
             className="text-[8px] px-2 py-1 rounded-full transition-colors"
@@ -112,7 +88,10 @@ const PreRideNav = ({
               background: 'hsl(195 100% 50% / 0.08)',
               border: '1px solid hsl(195 100% 50% / 0.2)',
             }}
-            onClick={() => window.dispatchEvent(new CustomEvent('video_control', { detail: action }))}
+            onClick={() => {
+              if (startsRide) onStart();
+              window.dispatchEvent(new CustomEvent('video_control', { detail: command }));
+            }}
           >
             {emoji} {label}
           </button>

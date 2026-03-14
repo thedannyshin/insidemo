@@ -9,10 +9,10 @@ type IncidentEvent = {
 
 export function useRideEngine() {
   const {
-    phase, setPhase, speed, setSpeed, setEta, setCurrentStreet,
+    setPhase, setSpeed, setCurrentStreet,
     setNextTurn, setRouteProgress, incidents, setIncidents,
-    fireIncident, clearIncident, activeIncident, firedIncidentIds,
-    rideStartTime, setRideStartTime, setRideElapsed, setMusic, resetRide,
+    fireIncident, clearIncident, firedIncidentIds,
+    setRideStartTime, setRideElapsed, setMusic, resetRide,
   } = useRideStore();
 
   const frameRef = useRef<number>();
@@ -145,9 +145,10 @@ export function useRideEngine() {
         );
         const wp = waypoints[wpIndex];
 
+        const boundedSpeed = 20 + Math.round(((Math.sin(elapsed * 0.9) + 1) / 2) * 5);
+
         setCurrentStreet(wp.streetName);
-        setSpeed(wp.speed);
-        setEta(Math.max(0, Math.round(totalTime - elapsed)));
+        setSpeed(boundedSpeed);
 
         if (wp.turnInstruction) {
           setNextTurn(wp.turnInstruction);
@@ -167,7 +168,7 @@ export function useRideEngine() {
     },
     [
       processQueue, setRideElapsed, setRouteProgress, setCurrentStreet,
-      setSpeed, setEta, setNextTurn, setPhase, setMusic,
+      setSpeed, setNextTurn, setPhase, setMusic,
     ]
   );
 
