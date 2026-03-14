@@ -197,8 +197,8 @@ const CabinScene = ({
     {/* Street View panorama as full background */}
     <StreetViewPanorama />
 
-    {/* Transparent overlay to capture pointer events for look-around (iframe steals them otherwise) */}
-    <div style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+    {/* Transparent overlay — pass through pointer events so Html panels remain interactive */}
+    <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }} />
 
     {/* 3D cabin overlay with transparent background */}
     <Canvas
