@@ -145,9 +145,10 @@ export function useRideEngine() {
         );
         const wp = waypoints[wpIndex];
 
+        const boundedSpeed = 20 + Math.round(((Math.sin(elapsed * 0.9) + 1) / 2) * 5);
+
         setCurrentStreet(wp.streetName);
-        setSpeed(wp.speed);
-        setEta(Math.max(0, Math.round(totalTime - elapsed)));
+        setSpeed(boundedSpeed);
 
         if (wp.turnInstruction) {
           setNextTurn(wp.turnInstruction);
