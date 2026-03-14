@@ -1,73 +1,185 @@
-# Welcome to your Lovable project
+<p align="center">
+  <img src="https://img.shields.io/badge/InsideMo-Autonomous%20Cabin%20Experience-00bfff?style=for-the-badge&labelColor=0a0f19" alt="InsideMo" />
+</p>
 
-## Project info
+<h1 align="center">🚘 InsideMo</h1>
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+<p align="center">
+  <strong>The future of autonomous vehicle passenger experiences.</strong><br/>
+  <em>A real-time, immersive cabin simulation that transforms every ride into a journey.</em>
+</p>
 
-## How can I edit this code?
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18-61dafb?style=flat-square&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Three.js-r3f-black?style=flat-square&logo=threedotjs&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind-4-06b6d4?style=flat-square&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Zustand-State-orange?style=flat-square" />
+</p>
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🎯 The Problem
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+> Autonomous vehicles remove the driver — but what replaces the experience?
 
-Changes made via Lovable will be committed automatically to this repo.
+Passengers in self-driving cars face a void: no steering wheel to hold, no road to watch, no sense of control. The cabin becomes a waiting room. **InsideMo turns it into a command center.**
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 💡 The Vision
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**InsideMo** is a full-stack cabin UI for autonomous vehicles — a real-time, WebGL-powered experience that keeps passengers informed, entertained, and in control.
 
-Follow these steps:
+Think **Tesla's infotainment × Google Maps × flight simulator HUD** — built for the post-driving era.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🏗️ Architecture
 
-# Step 3: Install the necessary dependencies.
-npm i
+```
+┌─────────────────────────────────────────────────┐
+│                  InsideMo Cabin                  │
+│                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
+│  │  3D GLB  │  │ YouTube  │  │  Google Maps  │  │
+│  │  Cabin   │  │ 360° POV │  │  Navigation   │  │
+│  │  Model   │  │  Stream  │  │    Engine      │  │
+│  └────┬─────┘  └────┬─────┘  └───────┬───────┘  │
+│       │              │                │          │
+│       └──────────────┼────────────────┘          │
+│                      │                           │
+│              ┌───────▼────────┐                  │
+│              │  Ride Engine   │                  │
+│              │  (Zustand)     │                  │
+│              └───────┬────────┘                  │
+│                      │                           │
+│       ┌──────────────┼──────────────┐            │
+│       ▼              ▼              ▼            │
+│  ┌─────────┐  ┌───────────┐  ┌──────────┐       │
+│  │   HUD   │  │ Incident  │  │  Voice   │       │
+│  │ Overlay │  │  System   │  │ Narration│       │
+│  └─────────┘  └───────────┘  └──────────┘       │
+└─────────────────────────────────────────────────┘
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+---
+
+## ✨ Key Features
+
+### 🎥 Immersive 360° Street View
+A YouTube 360° video stream synced to route waypoints. The camera POV tracks the vehicle's heading in real-time — look around the cabin and the outside world follows.
+
+- **Heading interpolation** from GPS waypoints
+- **Camera-linked POV** — drag to look around, the video follows
+- **Seamless full-length playback** — no loops, no jumps
+
+### 🏎️ Real-Time HUD Dashboard
+A translucent heads-up display rendered inside the 3D cabin, showing:
+
+| Metric | Source |
+|--------|--------|
+| **MPH** | Waypoint speed data + natural variation |
+| **Street Name** | Live route waypoint labels |
+| **ETA** | YouTube player remaining time |
+| **Incidents** | Severity-coded alert popups |
+
+### 🚨 Incident System
+A synchronized multi-channel alert system that fires across **visual**, **audio**, and **haptic** layers simultaneously:
+
+- **HUD popup** with severity-coded borders (🔴 alert / 🟡 caution / 🔵 info)
+- **Voice narration** via Web Speech API with natural voice selection
+- **Camera jolt** — subtle shake effect on high-severity events
+- **Incident card** on the right screen with "Why" and "What's next" breakdown
+- **Sub-16ms dispatch** — all channels fire in a single frame
+
+### 🗺️ Dual-Screen Dashboard
+Two in-cabin screens rendered as HTML panels inside the 3D scene:
+
+| Left Screen | Right Screen |
+|-------------|--------------|
+| Google Maps with dark theme | Pre-ride controls |
+| Live route with progress tracking | Turn-by-turn navigation |
+| Origin/destination markers | Incident detail cards |
+| Auto-panning with ride progress | Trip summary on arrival |
+
+### 🦅 Bird's Eye View
+Toggle to an aerial Google Maps view with:
+- **3D car model** (GLB) rendered via WebGL overlay
+- **Real-time position** interpolated along the route
+- **Dynamic heading** calculated from route trajectory
+- **60° tilt** for cinematic perspective
+
+### 🎭 3D Cabin Environment
+A photorealistic vehicle interior rendered with Three.js / React Three Fiber:
+
+- **GLB cabin model** with material-aware glass transparency
+- **Dynamic lighting** — ambient, directional, hemisphere, point lights
+- **Subtle camera bob** synced to ride phase
+- **Pointer-drag look-around** with momentum
+- **Scroll-to-zoom** FOV control
+
+### 🎵 Ride Lifecycle Engine
+A state machine that orchestrates the entire experience:
+
+```
+pre-ride → takeoff (speed ramp) → riding (route playback) → arrived
+```
+
+- **Speed ramp-up** with cubic easing during takeoff
+- **Incident queue** — events scheduled by timestamp, fired frame-accurately
+- **Auto-dismiss** with configurable timers
+- **Replay** — full state reset and re-queue
+
+---
+
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Rendering** | React Three Fiber + Three.js |
+| **State** | Zustand (single store, selector pattern) |
+| **Styling** | Tailwind CSS with HSL design tokens |
+| **Maps** | Google Maps JavaScript API + `@vis.gl/react-google-maps` |
+| **Video** | YouTube IFrame API (360° spherical) |
+| **Voice** | Web Speech Synthesis API |
+| **Backend** | Lovable Cloud (Edge Functions) |
+| **Build** | Vite + TypeScript |
+
+---
+
+## 🚀 Getting Started
+
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📐 Design System
 
-**Use GitHub Codespaces**
+InsideMo uses a custom dark-mode design language inspired by automotive HUDs:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Primary accent**: `hsl(195 100% 50%)` — electric cyan
+- **Typography**: Space Grotesk (display) + JetBrains Mono (data)
+- **Glass effects**: `backdrop-filter: blur()` with layered borders
+- **Severity palette**: Red → Amber → Cyan for alert → caution → info
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🛣️ Roadmap
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- [ ] Multi-route selection with real-time traffic
+- [ ] Passenger preference profiles (cabin modes)
+- [ ] Real sensor data integration (V2X, LiDAR overlay)
+- [ ] Multi-passenger sync via WebSocket
+- [ ] AR windshield HUD projection
+- [ ] Voice command interface
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+<p align="center">
+  <strong>InsideMo</strong> — Because the ride is the destination.<br/>
+  <sub>Built with ❤️ and WebGL</sub>
+</p>
