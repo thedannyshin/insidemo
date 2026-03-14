@@ -47,6 +47,7 @@ interface RideState {
   destination: string;
   selectedVideoId: string;
   cabinMode: CabinMode;
+  initialHeading: number;
 
   // Route state
   speed: number;
@@ -71,6 +72,7 @@ interface RideState {
   setDestination: (destination: string) => void;
   setSelectedVideoId: (videoId: string) => void;
   setCabinMode: (mode: CabinMode) => void;
+  setInitialHeading: (heading: number) => void;
   setSpeed: (speed: number) => void;
   setCurrentStreet: (street: string) => void;
   setNextTurn: (turn: string) => void;
@@ -100,6 +102,7 @@ export const useRideStore = create<RideState>((set) => ({
   destination: '',
   selectedVideoId: DEFAULT_VIDEO_ID,
   cabinMode: 'entertainment',
+  initialHeading: 315,
   speed: 0,
   currentStreet: 'Market Street',
   nextTurn: '',
@@ -117,6 +120,7 @@ export const useRideStore = create<RideState>((set) => ({
   setDestination: (destination) => set({ destination }),
   setSelectedVideoId: (videoId) => set({ selectedVideoId: videoId }),
   setCabinMode: (mode) => set({ cabinMode: mode }),
+  setInitialHeading: (heading) => set({ initialHeading: heading }),
   setSpeed: (speed) => set({ speed }),
   setCurrentStreet: (street) => set({ currentStreet: street }),
   setNextTurn: (turn) => set({ nextTurn: turn }),
