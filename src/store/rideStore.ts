@@ -120,6 +120,7 @@ export const useRideStore = create<RideState>((set) => ({
   setDestination: (destination) => set({ destination }),
   setSelectedVideoId: (videoId) => set({ selectedVideoId: videoId }),
   setCabinMode: (mode) => set({ cabinMode: mode }),
+  setInitialHeading: (heading) => set({ initialHeading: heading }),
   setSpeed: (speed) => set({ speed }),
   setCurrentStreet: (street) => set({ currentStreet: street }),
   setNextTurn: (turn) => set({ nextTurn: turn }),
