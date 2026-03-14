@@ -26,6 +26,11 @@ const StreetViewPanorama = () => {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify(msg), '*');
   }, []);
 
+  // Reset ready state when video changes
+  useEffect(() => {
+    setPlayerReady(false);
+  }, [selectedVideoId]);
+
   // Load route data
   useEffect(() => {
     fetch('/data/route.json')
