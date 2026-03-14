@@ -204,5 +204,5 @@ export function useRideEngine() {
     };
   }, []);
 
-  return { startRide, replayRide };
+  return { startRide, stopRide, replayRide };
 }
