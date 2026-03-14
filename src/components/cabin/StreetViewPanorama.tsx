@@ -76,7 +76,7 @@ const StreetViewPanorama = () => {
 
   // Sync heading/pitch and video timeline with route progress
   useEffect(() => {
-    if (!playerReadyRef.current) return;
+    if (!playerReady) return;
 
     const rd = routeDataRef.current;
     let iHeading = 315; // default heading
