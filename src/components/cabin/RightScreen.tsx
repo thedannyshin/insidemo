@@ -119,26 +119,6 @@ const PreRideNav = ({
         ))}
       </div>
 
-      <div className="flex items-center justify-between mt-auto">
-        <div className="text-[10px] text-muted-foreground">
-          {selected
-            ? `ETA ${selected.duration} • ${selected.distance}`
-            : 'Select a destination'}
-        </div>
-        <button
-          className="px-4 py-1.5 rounded-lg text-[10px] font-medium transition-all disabled:opacity-30"
-          style={{
-            background: destination
-              ? 'linear-gradient(135deg, hsl(195 100% 50%), hsl(280 80% 60%))'
-              : 'hsl(220 15% 15%)',
-            color: destination ? 'hsl(220 20% 4%)' : 'hsl(215 12% 40%)',
-          }}
-          disabled={!destination}
-          onClick={onStart}
-        >
-          Start Ride
-        </button>
-      </div>
     </div>
   );
 };
