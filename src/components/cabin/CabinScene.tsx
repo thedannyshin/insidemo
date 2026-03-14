@@ -207,6 +207,7 @@ const CabinScene = ({
     >
       <CabinScene3D onStartRide={onStartRide} onReplay={onReplay} />
     </Canvas>
+    <CameraDebugSliders />
   </div>
 );
 
