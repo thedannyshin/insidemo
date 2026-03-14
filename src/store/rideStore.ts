@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-
+import { DEFAULT_VIDEO_ID } from '@/lib/videoDestinations';
 export type RidePhase = 'pre-ride' | 'takeoff' | 'riding' | 'arrived';
 export type ViewMode = 'cabin' | 'birdseye';
 export type CabinMode = 'entertainment' | 'business' | 'relax' | 'party';
@@ -45,6 +45,7 @@ interface RideState {
   viewMode: ViewMode;
   passengerName: string;
   destination: string;
+  selectedVideoId: string;
   cabinMode: CabinMode;
 
   // Route state
@@ -68,6 +69,7 @@ interface RideState {
   setPhase: (phase: RidePhase) => void;
   setViewMode: (mode: ViewMode) => void;
   setDestination: (destination: string) => void;
+  setSelectedVideoId: (videoId: string) => void;
   setCabinMode: (mode: CabinMode) => void;
   setSpeed: (speed: number) => void;
   setCurrentStreet: (street: string) => void;
@@ -96,6 +98,7 @@ export const useRideStore = create<RideState>((set) => ({
   viewMode: 'cabin',
   passengerName: 'Alex',
   destination: '',
+  selectedVideoId: DEFAULT_VIDEO_ID,
   cabinMode: 'entertainment',
   speed: 0,
   currentStreet: 'Market Street',
@@ -112,6 +115,7 @@ export const useRideStore = create<RideState>((set) => ({
   setPhase: (phase) => set({ phase }),
   setViewMode: (mode) => set({ viewMode: mode }),
   setDestination: (destination) => set({ destination }),
+  setSelectedVideoId: (videoId) => set({ selectedVideoId: videoId }),
   setCabinMode: (mode) => set({ cabinMode: mode }),
   setSpeed: (speed) => set({ speed }),
   setCurrentStreet: (street) => set({ currentStreet: street }),
@@ -159,6 +163,7 @@ export const useRideStore = create<RideState>((set) => ({
       activeIncident: null,
       firedIncidentIds: [],
       destination: '',
+      selectedVideoId: DEFAULT_VIDEO_ID,
       music: initialMusic,
     }),
 }));

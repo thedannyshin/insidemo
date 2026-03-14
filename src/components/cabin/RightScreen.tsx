@@ -1,4 +1,6 @@
 import { useRideStore } from '@/store/rideStore';
+import { VIDEO_DESTINATIONS } from '@/lib/videoDestinations';
+import { useState, useMemo } from 'react';
 
 const RightScreen = ({
   onStartRide,
@@ -56,48 +58,103 @@ const PreRideNav = ({
 }: {
   onStart: () => void;
 }) => {
-  const controls = [
-    { label: 'Stop', emoji: '🛑', command: 'pause', startsRide: false },
-    { label: 'Go', emoji: '🟢', command: 'play', startsRide: true },
-    { label: 'Pull Over', emoji: '🅿️', command: 'pause', startsRide: false },
-  ] as const;
+  const { selectedVideoId, setSelectedVideoId, setDestination } = useRideStore();
+  const [expandedCity, setExpandedCity] = useState<string | null>(null);
+
+  const cities = useMemo(() => {
+    const map = new Map<string, typeof VIDEO_DESTINATIONS>();
+    VIDEO_DESTINATIONS.forEach((d) => {
+      if (!map.has(d.city)) map.set(d.city, []);
+      map.get(d.city)!.push(d);
+    });
+    return Array.from(map.entries());
+  }, []);
+
+  const selected = VIDEO_DESTINATIONS.find((d) => d.videoId === selectedVideoId);
+
+  const handleSelect = (dest: typeof VIDEO_DESTINATIONS[0]) => {
+    setSelectedVideoId(dest.videoId);
+    setDestination(`${dest.landmark}, ${dest.city}`);
+  };
 
   return (
-    <div className="flex flex-col h-full gap-2">
+    <div className="flex flex-col h-full gap-1.5">
       <div className="text-[9px] tracking-[0.2em] uppercase text-muted-foreground insidemo-mono">
-        Choose a Route
+        Choose Destination
       </div>
 
-      <div className="insidemo-glass rounded-lg p-2">
-        <div className="text-[9px] text-muted-foreground mb-0.5">📍 Pickup</div>
-        <div className="text-[10px]">Market St & 4th St, San Francisco</div>
-      </div>
-
-      <div className="insidemo-glass rounded-lg p-2">
-        <div className="text-[9px] text-muted-foreground mb-1">🏁 Destination</div>
-        <div className="text-[10px]">Fisherman's Wharf</div>
-      </div>
-
-      {/* Vehicle control chips */}
-      <div className="flex flex-wrap gap-1 mt-1">
-        {controls.map(({ label, emoji, command, startsRide }) => (
-          <button
-            key={label}
-            className="text-[8px] px-2 py-1 rounded-full transition-colors"
-            style={{
-              background: 'hsl(195 100% 50% / 0.08)',
-              border: '1px solid hsl(195 100% 50% / 0.2)',
-            }}
-            onClick={() => {
-              if (startsRide) onStart();
-              window.dispatchEvent(new CustomEvent('video_control', { detail: command }));
-            }}
-          >
-            {emoji} {label}
-          </button>
+      {/* Destination list grouped by city */}
+      <div className="flex-1 overflow-y-auto pr-1" style={{ maxHeight: 120, scrollbarWidth: 'thin' }}>
+        {cities.map(([city, destinations]) => (
+          <div key={city} className="mb-1">
+            <button
+              className="w-full text-left text-[9px] font-bold uppercase tracking-wider insidemo-mono px-1.5 py-0.5 rounded"
+              style={{
+                color: expandedCity === city || (!expandedCity && destinations.some(d => d.videoId === selectedVideoId))
+                  ? 'hsl(195 100% 50%)'
+                  : 'rgba(200, 220, 240, 0.5)',
+              }}
+              onClick={() => setExpandedCity(expandedCity === city ? null : city)}
+            >
+              {city} ({destinations.length})
+            </button>
+            {(expandedCity === city || (!expandedCity && destinations.some(d => d.videoId === selectedVideoId))) && (
+              <div className="flex flex-col gap-0.5 ml-1">
+                {destinations.map((dest) => {
+                  const isActive = dest.videoId === selectedVideoId;
+                  return (
+                    <button
+                      key={dest.id}
+                      className="w-full text-left rounded-md px-2 py-1 transition-all text-[10px]"
+                      style={{
+                        background: isActive
+                          ? 'hsl(195 100% 50% / 0.12)'
+                          : 'transparent',
+                        border: isActive
+                          ? '1px solid hsl(195 100% 50% / 0.3)'
+                          : '1px solid transparent',
+                        color: isActive
+                          ? 'hsl(195 100% 70%)'
+                          : 'rgba(200, 220, 240, 0.7)',
+                      }}
+                      onClick={() => handleSelect(dest)}
+                    >
+                      <span className="mr-1">{dest.emoji}</span>
+                      {dest.landmark}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
+      {/* Selected destination display */}
+      {selected && (
+        <div className="insidemo-glass rounded-lg px-2 py-1.5 flex items-center gap-2">
+          <span className="text-sm">{selected.emoji}</span>
+          <div>
+            <div className="text-[10px] font-medium">{selected.landmark}</div>
+            <div className="text-[8px] text-muted-foreground">{selected.city} • 360° VR</div>
+          </div>
+        </div>
+      )}
+
+      {/* Go button */}
+      <button
+        className="w-full py-1.5 rounded-lg text-xs font-medium transition-all"
+        style={{
+          background: 'linear-gradient(135deg, hsl(195 100% 50%), hsl(280 80% 60%))',
+          color: 'hsl(220 20% 4%)',
+        }}
+        onClick={() => {
+          onStart();
+          window.dispatchEvent(new CustomEvent('video_control', { detail: 'play' }));
+        }}
+      >
+        🟢 Start Ride
+      </button>
     </div>
   );
 };

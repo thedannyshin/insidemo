@@ -12,12 +12,11 @@ const lerpAngle = (a: number, b: number, t: number) => {
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-const YOUTUBE_VIDEO_ID = 'c9OcB9CzKpA';
-
 const StreetViewPanorama = () => {
   const routeProgress = useRideStore((s) => s.routeProgress);
   const phase = useRideStore((s) => s.phase);
   const setEta = useRideStore((s) => s.setEta);
+  const selectedVideoId = useRideStore((s) => s.selectedVideoId);
   const rotation = useCameraOffset((s) => s.rotation);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeDataRef = useRef<any>(null);
@@ -157,7 +156,7 @@ function animatePov(){
 
 function onYouTubeIframeAPIReady(){
   player=new YT.Player("player",{
-    videoId:"${YOUTUBE_VIDEO_ID}",
+    videoId:"${selectedVideoId}",
     playerVars:{
       autoplay:1,
       mute:1,
@@ -220,6 +219,7 @@ window.addEventListener("message",function(e){
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#000', overflow: 'hidden' }}>
       <iframe
+        key={selectedVideoId}
         ref={iframeRef}
         srcDoc={srcdoc}
         style={{ position: 'absolute', width: '100%', height: '100%', border: 'none' }}
