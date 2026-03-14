@@ -20,7 +20,7 @@ const StreetViewPanorama = () => {
   const rotation = useCameraOffset((s) => s.rotation);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const routeDataRef = useRef<any>(null);
-  const playerReadyRef = useRef(false);
+  const [playerReady, setPlayerReady] = useState(false);
 
   const postToIframe = useCallback((msg: Record<string, unknown>) => {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify(msg), '*');
