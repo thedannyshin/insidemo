@@ -89,45 +89,14 @@ export function useRideEngine() {
     }
   }, [handleFireIncident]);
 
-  const startRide = useCallback(() => {
-    const now = Date.now();
-    setRideStartTime(now);
-    setPhase('takeoff');
-    setMusic({ isPlaying: true });
-
-    // Build sorted event queue
-    incidentQueueRef.current = incidents
-      .filter(inc => !firedIncidentIds.includes(inc.id))
-      .map(inc => ({ incident: inc, fireAt: now + inc.timestamp * 1000 }))
-      .sort((a, b) => a.fireAt - b.fireAt);
-
-    // Speed ramp
-    const rampStart = Date.now();
-    const rampDuration = 4000;
-    const targetSpeed = 25;
-
-    const rampUp = () => {
-      const elapsed = Date.now() - rampStart;
-      const progress = Math.min(elapsed / rampDuration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setSpeed(Math.round(targetSpeed * eased));
-
-      if (progress < 1) {
-        frameRef.current = requestAnimationFrame(rampUp);
-      } else {
-        setPhase('riding');
-        startRoutePlayback(now);
-      }
-    };
-    frameRef.current = requestAnimationFrame(rampUp);
-  }, [setPhase, setSpeed, setRideStartTime, setMusic, incidents, firedIncidentIds]);
+  const startRoutePlaybackRef = useRef<(startTime: number) => void>();
 
   const startRoutePlayback = useCallback(
     (startTime: number) => {
       const route = routeDataRef.current;
       if (!route) return;
 
-      const totalTime = route.estimatedTime * 60; // convert minutes to seconds
+      const totalTime = route.estimatedTime * 60;
       const waypoints = route.waypoints;
 
       const tick = () => {
@@ -136,7 +105,6 @@ export function useRideEngine() {
         setRideElapsed(elapsed);
         setRouteProgress(progress);
 
-        // Process event queue
         processQueue(startTime);
 
         const wpIndex = Math.min(
@@ -171,6 +139,39 @@ export function useRideEngine() {
       setSpeed, setNextTurn, setPhase, setMusic,
     ]
   );
+
+  startRoutePlaybackRef.current = startRoutePlayback;
+
+  const startRide = useCallback(() => {
+    const now = Date.now();
+    setRideStartTime(now);
+    setPhase('takeoff');
+    setMusic({ isPlaying: true });
+
+    incidentQueueRef.current = incidents
+      .filter(inc => !firedIncidentIds.includes(inc.id))
+      .map(inc => ({ incident: inc, fireAt: now + inc.timestamp * 1000 }))
+      .sort((a, b) => a.fireAt - b.fireAt);
+
+    const rampStart = Date.now();
+    const rampDuration = 4000;
+    const targetSpeed = 25;
+
+    const rampUp = () => {
+      const elapsed = Date.now() - rampStart;
+      const progress = Math.min(elapsed / rampDuration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setSpeed(Math.round(targetSpeed * eased));
+
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(rampUp);
+      } else {
+        setPhase('riding');
+        startRoutePlaybackRef.current?.(now);
+      }
+    };
+    frameRef.current = requestAnimationFrame(rampUp);
+  }, [setPhase, setSpeed, setRideStartTime, setMusic, incidents, firedIncidentIds]);
 
   const replayRide = useCallback(() => {
     incidentQueueRef.current = [];
