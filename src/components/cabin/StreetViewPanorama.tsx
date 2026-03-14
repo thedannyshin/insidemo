@@ -128,6 +128,16 @@ const StreetViewPanorama = () => {
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#000}
 #player{width:100%;height:100%}
+/* Hide all YouTube UI overlays */
+.ytp-chrome-top,.ytp-chrome-bottom,.ytp-gradient-top,.ytp-gradient-bottom,
+.ytp-watermark,.ytp-show-cards-title,.ytp-pause-overlay,.ytp-spinner,
+.ytp-title,.ytp-button,.ytp-menuitem,.ytp-popup,.ytp-tooltip,
+.ytp-share-button-visible,.ytp-overflow-button,.iv-branding,
+.annotation,.ytp-ce-element,.ytp-endscreen-content,
+.ytp-impression-link,.branding-img-container{
+  display:none!important;opacity:0!important;pointer-events:none!important;
+}
+iframe{border:none}
 </style>
 </head>
 <body>
