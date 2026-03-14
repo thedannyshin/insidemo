@@ -87,7 +87,7 @@ const StreetViewPanorama = () => {
     const rd = routeDataRef.current;
     let iHeading = initialHeading; // AI-detected or default heading
 
-    if (rd?.waypoints?.length && routeProgress > 0) {
+    if (phase === 'riding' && rd?.waypoints?.length && routeProgress > 0) {
       const waypoints = rd.waypoints;
       const totalWp = waypoints.length;
       const floatIndex = routeProgress * (totalWp - 1);
