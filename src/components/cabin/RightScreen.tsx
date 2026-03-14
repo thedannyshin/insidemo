@@ -74,7 +74,7 @@ const RideControls = ({ onStart }: { onStart: () => void }) => {
               >
                 <span className="text-xs flex-shrink-0">{dest.emoji}</span>
                 <span className="text-[10px] leading-tight truncate">{dest.landmark}</span>
-                <span className="text-[7px] text-muted-foreground ml-auto flex-shrink-0 insidemo-mono">{dest.city.split(' ')[0]}</span>
+                <span className="text-[7px] text-muted-foreground ml-auto flex-shrink-0 whitespace-nowrap insidemo-mono">{dest.city}</span>
               </button>
             );
           })}
