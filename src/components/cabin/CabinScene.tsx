@@ -186,55 +186,6 @@ const CabinScene3D = ({
   );
 };
 
-const RecalibrateButton = () => {
-  const [loading, setLoading] = useState(false);
-  const selectedVideoId = useRideStore((s) => s.selectedVideoId);
-  const setInitialHeading = useRideStore((s) => s.setInitialHeading);
-
-  const handleRecalibrate = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { data, error } = await supabase.functions.invoke('detect-heading', {
-        body: { videoId: selectedVideoId },
-      });
-      if (!error && data?.heading != null) {
-        setInitialHeading(data.heading);
-        console.log(`[InsideMo] Recalibrated heading: ${data.heading}°`);
-      }
-    } catch (e) {
-      console.warn('[InsideMo] Recalibrate failed', e);
-    }
-    setLoading(false);
-  }, [selectedVideoId, setInitialHeading]);
-
-  return (
-    <button
-      onClick={handleRecalibrate}
-      disabled={loading}
-      style={{
-        position: 'absolute',
-        top: 16,
-        left: 16,
-        zIndex: 10,
-        padding: '6px 12px',
-        borderRadius: 8,
-        background: 'hsl(220 18% 12% / 0.85)',
-        border: '1px solid hsl(220 15% 22% / 0.5)',
-        color: 'rgba(200, 220, 240, 0.85)',
-        fontSize: 11,
-        fontWeight: 600,
-        cursor: loading ? 'wait' : 'pointer',
-        opacity: loading ? 0.6 : 1,
-        backdropFilter: 'blur(8px)',
-        pointerEvents: 'auto',
-      }}
-    >
-      {loading ? '⏳ Calibrating...' : '🧭 Recalibrate'}
-    </button>
-  );
-};
-
 const CabinScene = ({
   onStartRide,
   onReplay,
@@ -244,7 +195,6 @@ const CabinScene = ({
 }) => (
   <div className="w-full h-screen relative" style={{ background: '#000' }}>
     <StreetViewPanorama />
-    <RecalibrateButton />
     <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }} />
     <Canvas
       camera={{ position: [0, 0.55, 0.3], fov: 72, near: 0.01, far: 1000 }}
