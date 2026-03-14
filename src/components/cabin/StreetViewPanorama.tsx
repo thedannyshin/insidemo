@@ -138,11 +138,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 var player, duration=0, ready=false;
 var currentPov={yaw:315,pitch:0};
 var targetPov={yaw:315,pitch:0};
-var animFrame;
+var animFrame, etaTimer;
 
 function lerpAngle(a,b,t){
   var d=((b-a+540)%360)-180;
   return a+d*t;
+}
+
+function reportRemaining(){
+  if(!player||!ready||duration<=0||!player.getCurrentTime)return;
+  var ct=player.getCurrentTime()||0;
+  parent.postMessage({type:"yt360_time",remaining:Math.max(0,Math.round(duration-ct))},"*");
 }
 
 function animatePov(){
@@ -178,6 +184,8 @@ function onYouTubeIframeAPIReady(){
         duration=e.target.getDuration()||1;
         e.target.playVideo();
         parent.postMessage("yt360_ready","*");
+        reportRemaining();
+        etaTimer=setInterval(reportRemaining,500);
         animatePov();
       }
     }
