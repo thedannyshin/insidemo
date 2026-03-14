@@ -163,6 +163,7 @@ export const useRideStore = create<RideState>((set) => ({
       activeIncident: null,
       firedIncidentIds: [],
       destination: '',
+      selectedVideoId: DEFAULT_VIDEO_ID,
       music: initialMusic,
     }),
 }));
