@@ -219,6 +219,7 @@ window.addEventListener("message",function(e){
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, background: '#000', overflow: 'hidden' }}>
       <iframe
+        key={selectedVideoId}
         ref={iframeRef}
         srcDoc={srcdoc}
         style={{ position: 'absolute', width: '100%', height: '100%', border: 'none' }}
