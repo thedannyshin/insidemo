@@ -152,7 +152,7 @@ export const useRideStore = create<RideState>((set) => ({
       speed: 0,
       currentStreet: 'Market Street',
       nextTurn: '',
-      eta: 0,
+      eta: 1020,
       routeProgress: 0,
       rideStartTime: null,
       rideElapsed: 0,
