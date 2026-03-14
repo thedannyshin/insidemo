@@ -1,10 +1,30 @@
+import { useCallback, useState } from 'react';
 import { useRideStore } from '@/store/rideStore';
+import { supabase } from '@/integrations/supabase/client';
 
 const HUDOverlay = () => {
-  const { speed, currentStreet, eta } = useRideStore();
+  const { speed, currentStreet, eta, selectedVideoId, setInitialHeading } = useRideStore();
+  const [calibrating, setCalibrating] = useState(false);
 
   const etaMin = Math.floor(eta / 60);
   const etaSec = String(eta % 60).padStart(2, '0');
+
+  const handleRecalibrate = useCallback(async () => {
+    if (calibrating) return;
+    setCalibrating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('detect-heading', {
+        body: { videoId: selectedVideoId },
+      });
+      if (!error && data?.heading != null) {
+        setInitialHeading(data.heading);
+        console.log(`[InsideMo] Recalibrated heading: ${data.heading}°`);
+      }
+    } catch (e) {
+      console.warn('[InsideMo] Recalibrate failed', e);
+    }
+    setCalibrating(false);
+  }, [selectedVideoId, setInitialHeading, calibrating]);
 
   return (
     <div
@@ -19,9 +39,16 @@ const HUDOverlay = () => {
       }}
     >
       <div className="flex items-center justify-between w-full">
-        <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold insidemo-mono" style={{ color: 'hsl(195 100% 50%)' }}>
-            {speed}
+        <div
+          className="flex items-baseline gap-1 cursor-pointer select-none"
+          onDoubleClick={handleRecalibrate}
+          title="Double-click to recalibrate orientation"
+        >
+          <span
+            className="text-2xl font-bold insidemo-mono"
+            style={{ color: calibrating ? 'hsl(45 100% 60%)' : 'hsl(195 100% 50%)' }}
+          >
+            {calibrating ? '⏳' : speed}
           </span>
           <span className="text-[9px] text-muted-foreground insidemo-mono">MPH</span>
         </div>
