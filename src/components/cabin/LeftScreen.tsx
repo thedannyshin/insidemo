@@ -155,17 +155,6 @@ const NavigationMapView = ({ name }: { name: string }) => {
         </span>
       </div>
       {/* Bottom greeting overlay for pre-ride */}
-      {phase === 'pre-ride' && (
-        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-3 z-10"
-          style={{ background: 'linear-gradient(to bottom, transparent 0%, hsl(220 18% 8% / 0.9) 100%)' }}>
-          <h2 className="text-sm font-semibold insidemo-gradient-text">
-            Welcome back, {name}
-          </h2>
-          <p className="text-[9px] text-muted-foreground mt-0.5">
-            Your autonomous ride awaits
-          </p>
-        </div>
-      )}
     </div>
   );
 };
