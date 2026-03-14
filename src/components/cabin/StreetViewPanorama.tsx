@@ -113,11 +113,6 @@ const StreetViewPanorama = () => {
       pitch: finalPitch,
     });
 
-    // Sync video playback position with ride progress
-    postToIframe({
-      type: 'seek',
-      progress: routeProgress,
-    });
   }, [routeProgress, phase, rotation, postToIframe]);
 
   // Build the srcdoc HTML for the YouTube 360 player
