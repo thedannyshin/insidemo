@@ -76,21 +76,20 @@ const StreetViewPanorama = () => {
 
   // Sync heading/pitch and video timeline with route progress
   useEffect(() => {
+    if (!playerReadyRef.current) return;
+
     const rd = routeDataRef.current;
-    if (!rd?.waypoints?.length || !playerReadyRef.current) return;
+    let iHeading = 315; // default heading
 
-    const waypoints = rd.waypoints;
-    const totalWp = waypoints.length;
-
-    const floatIndex = routeProgress * (totalWp - 1);
-    const idxA = Math.min(Math.floor(floatIndex), totalWp - 1);
-    const idxB = Math.min(idxA + 1, totalWp - 1);
-    const subT = floatIndex - idxA;
-
-    const wpA = waypoints[idxA];
-    const wpB = waypoints[idxB];
-
-    const iHeading = lerpAngle(wpA.heading ?? 315, wpB.heading ?? 315, subT);
+    if (rd?.waypoints?.length) {
+      const waypoints = rd.waypoints;
+      const totalWp = waypoints.length;
+      const floatIndex = routeProgress * (totalWp - 1);
+      const idxA = Math.min(Math.floor(floatIndex), totalWp - 1);
+      const idxB = Math.min(idxA + 1, totalWp - 1);
+      const subT = floatIndex - idxA;
+      iHeading = lerpAngle(waypoints[idxA].heading ?? 315, waypoints[idxB].heading ?? 315, subT);
+    }
 
     const videoMaxH = useCameraBase.getState().videoMaxH;
     const videoMaxV = useCameraBase.getState().videoMaxV;
