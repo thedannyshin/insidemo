@@ -36,9 +36,8 @@ const RideControls = ({ onStart }: { onStart: () => void }) => {
   };
 
   const controls = [
-    { label: 'Go', emoji: '🟢', command: 'play', startsRide: true },
-    { label: 'Stop', emoji: '🛑', command: 'pause', startsRide: false },
-    { label: 'Pull Over', emoji: '🅿️', command: 'pause', startsRide: false },
+    { label: 'Start Ride', emoji: '🟢', command: 'play', startsRide: true },
+    { label: 'Stop Ride', emoji: '🛑', command: 'pause', startsRide: false },
   ] as const;
 
   return (
