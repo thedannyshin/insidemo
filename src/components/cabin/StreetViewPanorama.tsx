@@ -176,7 +176,7 @@ function onYouTubeIframeAPIReady(){
       onReady:function(e){
         ready=true;
         duration=e.target.getDuration()||1;
-        e.target.playVideo();
+        // Don't auto-play — wait for 'play' command
         parent.postMessage("yt360_ready","*");
         reportRemaining();
         etaTimer=setInterval(reportRemaining,500);
