@@ -95,21 +95,7 @@ const PreRideNav = ({
 
       <div className="insidemo-glass rounded-lg p-2">
         <div className="text-[9px] text-muted-foreground mb-1">🏁 Destination</div>
-        <select
-          className="w-full text-[10px] bg-transparent border-none outline-none cursor-pointer"
-          style={{ color: destination ? 'inherit' : 'hsl(215 12% 50%)' }}
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-        >
-          <option value="" style={{ background: 'hsl(220 18% 10%)' }}>
-            Select a destination…
-          </option>
-          {PRESET_ROUTES.map((r) => (
-            <option key={r.name} value={r.name} style={{ background: 'hsl(220 18% 10%)' }}>
-              {r.emoji} {r.name}
-            </option>
-          ))}
-        </select>
+        <div className="text-[10px]">Fisherman's Wharf</div>
       </div>
 
       {/* Vehicle control chips */}
