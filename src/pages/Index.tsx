@@ -8,7 +8,7 @@ const Index = () => {
   const { startRide, stopRide, replayRide } = useRideEngine();
 
   // Listen for stop_ride event from vehicle controls
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = () => stopRide();
     window.addEventListener('stop_ride', handler);
     return () => window.removeEventListener('stop_ride', handler);
