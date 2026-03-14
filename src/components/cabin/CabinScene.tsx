@@ -29,7 +29,12 @@ const CameraController = () => {
   const lastPointer = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    const isInsideHtmlPanel = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      return !!target.closest('[data-cabin-panel]');
+    };
     const onPointerDown = (e: PointerEvent) => {
+      if (isInsideHtmlPanel(e.target)) return;
       isDragging.current = true;
       lastPointer.current = { x: e.clientX, y: e.clientY };
     };
@@ -42,6 +47,7 @@ const CameraController = () => {
     };
     const onPointerUp = () => { isDragging.current = false; };
     const onWheel = (e: WheelEvent) => {
+      if (isInsideHtmlPanel(e.target)) return;
       e.preventDefault();
       zoom(e.deltaY * 0.05);
     };
@@ -154,11 +160,11 @@ const CabinScene3D = ({
       scale={hudScale}
       style={{ pointerEvents: 'auto' }}
     >
-      <div style={{
+      <div data-cabin-panel style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
       }}>
         <HUDOverlay />
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div data-cabin-panel style={{ display: 'flex', gap: 12 }}>
           <div style={{
             width: 360, height: 200, borderRadius: 12, overflow: 'hidden',
             boxShadow: '0 0 30px -5px hsl(195 100% 50% / 0.2), 0 4px 20px rgba(0,0,0,0.5)',
@@ -191,8 +197,8 @@ const CabinScene = ({
     {/* Street View panorama as full background */}
     <StreetViewPanorama />
 
-    {/* Transparent overlay to capture pointer events for look-around (iframe steals them otherwise) */}
-    <div style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+    {/* Transparent overlay — pass through pointer events so Html panels remain interactive */}
+    <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none' }} />
 
     {/* 3D cabin overlay with transparent background */}
     <Canvas
